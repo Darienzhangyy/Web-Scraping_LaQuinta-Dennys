@@ -9,10 +9,6 @@ to_put = 'data/lq/'
 dir.create(to_put, recursive=T, showWarnings=F)
 page = read_html('http://www.lq.com/en/findandbook/hotel-listings.html') 
 
-#############################################################################################
-# TO DO:                                                                                    #
-# (1) For Denny's, use download.file(method='wget').                                        #
-#############################################################################################
 
 # scrape_list()
 #############################################################################################
