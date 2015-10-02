@@ -203,4 +203,5 @@ if(nrow(hotel_info)==869) {
   hotel_info$details[details]
 }
 
+# Write the data frame to disk.
 save(file=paste0(to_put, 'lq.Rdata'), list=c('hotel_info'))

@@ -34,7 +34,7 @@ query_api = function(coordinate, key=api_key, limit=1000) {
                  '%3C%2Flatitude%3E%3Ccountry%3EUS%3C%2Fcountry%3E%3C%2Fgeoloc%3E%3C%2Fgeolocs%3E%3Cstateonly%3E%3C%2Fstateonly%3E%3Csearchradius%3E',
                  radius,
                  '%3C%2Fsearchradius%3E%3C%2Fformdata%3E%3C%2Frequest%3E')
-  download.file(query, destfile=paste0(to_put, 'latitude_', latitude, '.xml'), method='wget', quiet=T)
+  download.file(query, destfile=paste0(to_put, 'longitude_', longitude, '.xml'), method='wget', quiet=T)
 }
 
 # Run query_api on the rows of the to_get data frame to download XML files containing Dennys locations.
