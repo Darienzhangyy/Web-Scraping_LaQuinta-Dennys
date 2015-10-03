@@ -64,5 +64,11 @@ scrape_dennys = function(result) {
 dennys_info = ldply(store_nodes, scrape_dennys)
 colnames(dennys_info) = c('clientkey', 'address', 'phone', 'latitude', 'longitude')
 
+# Subset the data frame to include only US locations (those with a state abbreviation and ZIP code).
+has_zip = str_detect(dennys_info$address, '([A-Z][A-Z] \\d{5}$)|([A-Z][A-Z] \\d{5}-\\d{4}$)') %>% 
+          llply(function(row) { row[length(row)] } ) %>% 
+          unlist
+dennys_info = dennys_info[has_zip,]
+
 # Write the data frame to disk.
 save(file=paste0(to_put, 'dennys.Rdata'), list=c('dennys_info'))
