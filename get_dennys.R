@@ -20,22 +20,22 @@ api_key = '6B962D40-03BA-11E5-BC31-9A51842CA48B'
 # Output: Nothing; an XML file containing the results of the API query is downloaded to disk.
 
 query_api = function(coordinate, key=api_key, limit=1000) {
-  longitude = coordinate[,1]
-  latitude = coordinate[,2]
+  longitude = coordinate[,2]
+  latitude = coordinate[,1]
   radius = coordinate[,3]
-  query = paste0('https://hosted.where2getit.com/dennys/responsive/ajax?&xml_request=%3Crequest%3E%3Cappkey%3E',
+  query = paste0('https://hosted.where2getit.com/dennys/responsive/ajax?&xml_request=<request><appkey>',
                  key,
-                 '%3C%2Fappkey%3E%3Cformdata+id%3D%22locatorsearch%22%3E%3Cdataview%3Estore_default%3C%2Fdataview%3E%3Climit%3E',
+                 '</appkey><formdata id="locatorsearch"><dataview>store_default</dataview><limit>',
                  limit,
-                 '%3C%2Flimit%3E%3Corder%3Erank%2C_distance%3C%2Forder%3E%3Cgeolocs%3E%3Cgeoloc%3E%3Caddressline%3E%3C%2Faddressline%3E%3Clongitude%3E',
+                 '</limit><order>_distance</order><geolocs><geoloc><addressline></addressline><longitude>',
                  longitude,
-                 '%3C%2Flongitude%3E%3Clatitude%3E',
+                 '</longitude><latitude>',
                  latitude,
-                 '%3C%2Flatitude%3E%3Ccountry%3EUS%3C%2Fcountry%3E%3C%2Fgeoloc%3E%3C%2Fgeolocs%3E%3Cstateonly%3E%3C%2Fstateonly%3E%3Csearchradius%3E',
+                 '</latitude><country>US</country></geoloc></geolocs><stateonly>1</stateonly><searchradius>',
                  radius,
-                 '%3C%2Fsearchradius%3E%3C%2Fformdata%3E%3C%2Frequest%3E')
+                 '</searchradius></formdata></request>')
   download.file(query, destfile=paste0(to_put, 'longitude_', longitude, '.xml'), method='wget', quiet=T)
+  Sys.sleep(0.25)
 }
-
 # Run query_api on the rows of the to_get data frame to download XML files containing Dennys locations.
 a_ply(to_get, 1, query_api)

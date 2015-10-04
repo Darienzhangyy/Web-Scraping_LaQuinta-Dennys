@@ -45,8 +45,10 @@ query_sunlight = function(row, folder, key=sunlight_apikey) {
                  row$longitude,
                  '&apikey=',
                  key)
-  download.file(query, destfile=paste0(to_put, folder, '/', row$id, '.json'), method='wget', quiet=T)
-  Sys.sleep(0.25)
+  if(!(file.exists(paste0(to_put, folder, '/', row$id, '.json')))) {
+    download.file(query, destfile=paste0(to_put, folder, '/', row$id, '.json'), method='wget', quiet=T)
+    Sys.sleep(0.25)
+  }  
 }
 
 
@@ -69,7 +71,7 @@ to_get = function(folder) {
 #
 # Output: info, a character vector containing the name of the congressional representative,   
 #               the state and congressional district number (XX-#), and party affiliation.
-file = 'data/districts/dennys/1016.json'
+
 parse_json = function(file) {
   json = suppressWarnings(readLines(file))
   fields = json %>% 
