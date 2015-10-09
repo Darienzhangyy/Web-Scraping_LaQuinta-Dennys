@@ -4,13 +4,13 @@ output: pdf_document
 ---
 
 
-1. get_lq
+1. get_lq.R
 
-   We download information of laQuinta Hotels through steps as below:
+   We download information of LaQuinta through steps as below:
 
-A. Store all of laQuinta Hotels' websites into the 'data/lq/' directory using read_html function;
+A. Create a directory named 'data/lq/' to store links of LaQuinta's websites;
 
-B. Create a function called Scrape_list such that it: 
+B. Create a function named Scrape_list such that it: 
    
    1. Match US state names from csv file to US state abbreviations on website to identify American hotels;
    
@@ -31,7 +31,7 @@ B. Create a function called Scrape_list such that it:
    9. Then the function finally returns "links".
 
 
-C. Create a function called html_download such that it download a webpage and saved it to disk as an html file and direct the computer to rest for a quarter of a second;
+C. Create a function 'html_download' such that it download a webpage and saved it to disk as an html file and direct the computer to rest for a quarter of a second;
 
 D. Apply 'Scrape_list' function to LaQuinta websites that is previously stored, then apply  'html_download' function to save each link that Scrape_list function returns.
 
@@ -43,7 +43,7 @@ D. Apply 'Scrape_list' function to LaQuinta websites that is previously stored, 
 
 parse_lq.R:
 
-We parse laQuinta's data as below:
+We parse laQuinta's data through steps as below:
 
 A. Read in the html files to a list and remove the duplicate link if present;
 
@@ -120,3 +120,65 @@ Q. Write the data frame to disk.
 
 
 
+get_dannys.R
+
+
+We downloaded xml data from the Where2GetIt API through steps as follows:
+
+1. Create a variable named 'to_get' to read the file 'dannys_coords.csv' and create a directory called 'data/dennys/' in order to store API information later;
+
+2. Create a function named query_api that has following features:
+
+  a. Input: coordinate, a data frame row containing a longitude, a latitude, and a search radius;
+     
+            key (default=api_key), a valid API key allowing data scraping;
+            
+            limit (default=1000), an upper bound for the number of search results returned.
+
+  b. Output: Nothing; an XML file containing the results of the API query is downloaded to disk.
+ 
+
+3. Run query_api on the rows of the to_get data frame to download XML files containing Dennys locations.
+
+
+
+parse_dannys.R
+
+
+We parse danny's data with following steps:
+
+1.Read in the xml files to a list;
+
+2.Create a logical vector for subsetting the unique store ID numbers;
+
+3.Extract the results nodes for the unique Dennys locations;
+
+4.Create a function named scrape_tag() such that it has following features:
+
+   a.Input: tag, a particular xml tag whose value is to be extracted;
+ 
+         result, a particular result node.
+   
+   b.Output: the value of the xml tag.
+
+5. Create a function named scrape_dennys() such that it has following features:
+
+   a.Input: result, a particular result node.
+    
+   b.Output: a character vector with five elements:
+            
+            (1) clientkey, a unique store ID;
+            
+            (2) address, the address of the Dennys location;
+            
+            (3) phone, the phone number of the Dennys location;
+            
+            (4) latitude, the latitude of the Dennys location;
+      
+            (5) longitude, the longitude of the Dennys location.
+           
+6. Extract the relevant information from the search results into a data frame;
+
+7. Subset the data frame to include only US locations (those with a state abbreviation and ZIP code);
+
+8. Write the data frame to disk and save it as 'dennys.Rdata'.
