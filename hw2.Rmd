@@ -7,167 +7,46 @@ output: pdf_document
 
 **get_lq.R**
 
-   We download information of LaQuinta through steps as below:
-
-A. Create a directory named 'data/lq/' to store links of LaQuinta's websites;
-
-B. Create a function named Scrape_list such that it: 
-   
-   1. Match US state names from csv file to US state abbreviations on website to identify American hotels;
-   
-   2. Extract country/state abbreviations and replace NA with "NA;
-   
-   3. Extract the index from `rows` corresponding to the first entry after the US label;
-   
-   4. Extract the index from `rows` corresponding to the last entry before the Mexico label;
-   
-   5. Extract the indexes from `rows` corresponding to the state abbreviations;
-   
-   6. Extract the indexes from `rows` immediately following the state abbreviations;
-   
-   7. Extract the indexes from `rows` corresponding to all American hotels;
-   
-   8. Extract the links from the nodes indexed by `state_rows`
-   
-   9. Then the function finally returns "links".
-
-
-C. Create a function 'html_download' such that it download a webpage and saved it to disk as an html file and direct the computer to rest for a quarter of a second;
-
-D. Apply 'Scrape_list' function to LaQuinta websites that is previously stored, then apply  'html_download' function to save each link that Scrape_list function returns.\newline
+This document implements procedures to download websites of LaQuinta hotels that primarity operates in the United States and store those links into directory "data/lq/". We extract websites of those hotels by implementing a function named 'scrape_list' such that it has following functionality: (1) matching US state names from csv file to US state abbreviations on website to identify American hotels; (2) extracting country/state abbreviations and replace NA with "NA""; (3) extracting the indexes from `rows` corresponding to the first entry after the US label and before the Mexico label; (4) extracting the indexes from `rows` corresponding to the state abbreviations; (5) extracting the indexes from `rows` immediately following the state abbreviations and corresponding to all American hotels; (6) extracting the links from the nodes indexed by `state_rows`and return those links. Finally we implement the 'html_download' function to download those links that are extracted by 'Scrape_list' and store them into directory "data/lq/". \newline
 
   
-
 \quad\newline
 
 **parse_lq.R**
 
-We parse laQuinta's data through steps as below:
+This documents primary parses LaQuinta's hotel information of "name", "address", "phone", "fax", "latitude", "longtitude", "amenities", and "details" and store them as lq.Rdata in the "data/" directory. We first create a function named 'scrape_hotel' that it takes input as 'page' <full html file for a particular La Quinta hotel's webpage>, and returns output which is a list of 8 character vectors as above. After obtaining  the relative information, we then (1) check hotel names and addresses by visual inspection; (2) check hotel phone numbers by adherence to "1-xxx-xxx-xxxx" pattern and correct as needed; (3) replace " " with "-" corrects all flaws; (4) check hotel fax numbers by adherence to "1-xxx-xxx-xxxx" pattern and correct as needed; (5) replace " " with "-" corrects most - but not all - flaws; (6) insert "-" in the last seven digits corrects one more flaw; (7) trim leading zeroes corrects one more flaw; (8) convert three remaining flaws involve missing data to NAs;(9) check hotel names, addresses, hotel amenities, details correct and consistent as needed;(10) define and call a function to standardize hotel details and store those information into 'data/' directory. 
 
-A. Read in the html files to a list and remove the duplicate link if present;
-
-B. Create a function called scrape_hotel() that it has following features:
+The constructed data frame has the following column names:
    
-   a. Input: 'page', the full html file for a particular La Quinta hotel's webpage. And it returns
+   (1) name, the name of the hotel;
 
-   b. Output: info, a named list containing 8 character vectors:
-       
-       (1) name, the name of the hotel;
-        
-       (2) address, the address of the hotel;
-       
-       (3) phone, the phone number of the hotel;
-       
-       (4) fax, the fax number of the hotel;
-       
-       (5) latitude, the latitude of the hotel location;
-       
-       (6) longitude, the longitude of the hotel location;
-       
-       (7) amenities, the features of the hotel and the room;
-       
-       (8) details, the hotel details (# rooms, floors, etc.).
-       
+   (2) address, the address of the hotel;
 
+   (3) phone, the phone number of the hotel;
 
-   How we construct scrape_hotel():
+   (4) fax, the fax number of the hotel;
 
-       1. Parse the html;
-       
-       2. Extract the hotel name;
-       
-       3. Extract the raw address, phone number, and fax number into a vector, in that order;
-       
-       4. Extract and clean the address, phone number, and fax number from the contact vector;
-       
-       5. Extract the latitude and longitude of the hotel and output as character vector;
-       
-       6. Extract the hotel and room features and output as character vector;
-       
-       7. Extract the hotel details from lists and output as named character vector;
-       
-       8. Extract the relevant information from the hotel webpages into a data frame;
+   (5) latitude, the latitude of the hotel location;
 
+   (6) longitude, the longitude of the hotel location;
 
+   (7) amenities, the features of the hotel and the room;
 
-C. After obtaining  the relative information, check hotel names and addresses by visual inspection;
-
-D. Check hotel phone numbers by adherence to "1-xxx-xxx-xxxx" pattern and correct as needed;
-
-E. Replacing " " with "-" corrects all flaws;
-
-F. Check hotel fax numbers by adherence to "1-xxx-xxx-xxxx" pattern and correct as needed;
-
-G. Replacing " " with "-" corrects most - but not all - flaws;
-
-H. Inserting "-" in the last seven digits corrects one more flaw;
-
-I. Trimming leading zeroes corrects one more flaw;
-
-J. Three remaining flaws involve missing data; convert to NAs;
-
-K. Check hotel names and addresses by summary inspection and correct as needed;
-
-M. Check hotel amenities and details by summary inspection and correct as needed;
-
-N. Check if the hotel details are not consistent;
-
-O. Check the inconsistent entries by visual inspection;
-
-P. Define and call a function to standardize hotel details;
-
-Q. Write the data frame to disk.\newline
+   (8) details, the hotel details (# rooms, floors, etc.). \newline
 
 
 \quad\newline
 
 **get_dannys.R**
 
-
-We downloaded xml data from the Where2GetIt API through steps as follows:
-
-A. Create a variable named 'to_get' to read the file 'dannys_coords.csv' and create a directory called 'data/dennys/' in order to store API information later;
-
-B. Create a function named query_api that it has following features:
-
-   a. Input: coordinate, a data frame row containing a longitude, a latitude, and a search radius;
-     
-            key (default=api_key), a valid API key allowing data scraping;
-            
-            limit (default=1000), an upper bound for the number of search results returned.
-
-   b. Output: Nothing; an XML file containing the results of the API query is downloaded to disk.
- 
-
-C. Run query_api on the rows of the to_get data frame to download XML files containing Dennys locations.\newline
+This document implements steps to download xml data from the Where2GetIt API and store them into 'data/dennys/' directory. We first implement a function named query_api that it takes input as 'coordinate' <a data frame row containing a longitude, a latitude, and a search radius, key (default=api_key) <a valid API key allowing data scraping>, and limit (default=1000) <an upper bound for the number of search results returned> It returns an output of XML file containing the results of the API query is downloaded to disk. Finally we run query_api on the rows of the 'dennys_coords.csv' data frame to download XML files containing Dennys locations.\newline
 
 
 \quad\newline
 
 **parse_dannys.R**
 
-
-We parse danny's data with the following steps:
-
-A. Read in the xml files to a list;
-
-B. Create a logical vector for subsetting the unique store ID numbers;
-
-C. Extract the results nodes for the unique Dennys locations;
-
-D. Create a function named scrape_tag() such that it has following features:
-
-   a.Input: tag, a particular xml tag whose value is to be extracted;
- 
-         result, a particular result node.
-   
-   b.Output: the value of the xml tag.
-
-E. Create a function named scrape_dennys() such that it has following features:
-
-   a.Input: result, a particular result node.
-    
-   b.Output: a character vector with five elements:
+This documents parse denny's stores data and stores corresponding information as 'dennys.Rdata' in the 'data/' directory. We implement the procedures by (1) letting R read in xml file to a list;(2) create a logical vector for subsetting the unique store ID numbers;(3) extract the results nodes for the unique Dennys locations;(4) create a function named scrape_tag() such that it takes inputs 'tag' <a particular xml tag whose value is to be extracted>, and 'result'<a particular result node>. The function then returns an output that contains the value of the xml tag. We also create a function named scrape_dennys() that it takes input 'result' <a particular result node> and returns output as a character vector with five elements:
             
             (1) clientkey, a unique store ID;
             
@@ -179,11 +58,7 @@ E. Create a function named scrape_dennys() such that it has following features:
       
             (5) longitude, the longitude of the Dennys location.
            
-F. Extract the relevant information from the search results into a data frame;
-
-G. Subset the data frame to include only US locations (those with a state abbreviation and ZIP code);
-
-H. Write the data frame to disk and save it as 'dennys.Rdata'.
+We then extract the relevant information from the search results into a data frame, subset the data frame to include only US locations (those with a state abbreviation and ZIP code) and store them into 'data/' directory.
 
 
 
