@@ -4,9 +4,13 @@ library(magrittr)
 library(stringr)
 library(plyr)
 
+#Read data from 'lq_states.csv' 
 to_get = read.csv('lq_states.csv', header=F)
+#Name to_put as directory 'data/lq' 
 to_put = 'data/lq/'
+#Create the directory to_put 
 dir.create(to_put, recursive=T, showWarnings=F)
+#Save hotel websites into a variable named page
 page = read_html('http://www.lq.com/en/findandbook/hotel-listings.html') 
 
 
@@ -57,6 +61,7 @@ scrape_list = function(page) {
   links = rows[state_rows] %>% 
           html_attr('href') %>% 
           paste0('http://www.lq.com', .) %>%
+  # Return results as lists
           as.list(.)
   
   return(links)
@@ -78,4 +83,5 @@ html_download = function(link) {
 
 
 # Download the webpage for each La Quinta hotel in the US, at a rate of four per second.
+# l_ply takes each element of a list, apply function and discard results
 scrape_list(page) %>% l_ply(.fun=html_download)
