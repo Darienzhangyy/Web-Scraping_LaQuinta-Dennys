@@ -4,7 +4,8 @@ output: pdf_document
 ---
 
 
-1. get_lq.R
+
+**get_lq.R**
 
    We download information of LaQuinta through steps as below:
 
@@ -33,59 +34,59 @@ B. Create a function named Scrape_list such that it:
 
 C. Create a function 'html_download' such that it download a webpage and saved it to disk as an html file and direct the computer to rest for a quarter of a second;
 
-D. Apply 'Scrape_list' function to LaQuinta websites that is previously stored, then apply  'html_download' function to save each link that Scrape_list function returns.
+D. Apply 'Scrape_list' function to LaQuinta websites that is previously stored, then apply  'html_download' function to save each link that Scrape_list function returns.\newline
 
+  
 
+\quad\newline
 
-
-
-
-
-parse_lq.R:
+**parse_lq.R**
 
 We parse laQuinta's data through steps as below:
 
 A. Read in the html files to a list and remove the duplicate link if present;
 
-B. Create a function called scrape_hotel() that it takes input as 'page', the full html file for a particular La Quinta hotel's webpage. And it returns
+B. Create a function called scrape_hotel() that it has following features:
+   
+   a. Input: 'page', the full html file for a particular La Quinta hotel's webpage. And it returns
 
-Output: info, a named list containing 8 character vectors:
+   b. Output: info, a named list containing 8 character vectors:
        
-       name, the name of the hotel;
+       (1) name, the name of the hotel;
         
-       address, the address of the hotel;
+       (2) address, the address of the hotel;
        
-       phone, the phone number of the hotel;
+       (3) phone, the phone number of the hotel;
        
-       fax, the fax number of the hotel;
+       (4) fax, the fax number of the hotel;
        
-       latitude, the latitude of the hotel location;
+       (5) latitude, the latitude of the hotel location;
        
-       longitude, the longitude of the hotel location;
+       (6) longitude, the longitude of the hotel location;
        
-       amenities, the features of the hotel and the room;
+       (7) amenities, the features of the hotel and the room;
        
-       details, the hotel details (# rooms, floors, etc.).
+       (8) details, the hotel details (# rooms, floors, etc.).
        
 
 
-How we construct scrape_hotel():
+   How we construct scrape_hotel():
 
-1. Parse the html;
-
-2. Extract the hotel name;
-
-3. Extract the raw address, phone number, and fax number into a vector, in that order;
-
-4. Extract and clean the address, phone number, and fax number from the contact vector;
-
-5. Extract the latitude and longitude of the hotel and output as character vector;
-
-6. Extract the hotel and room features and output as character vector;
-
-7. Extract the hotel details from lists and output as named character vector;
-
-8. Extract the relevant information from the hotel webpages into a data frame;
+       1. Parse the html;
+       
+       2. Extract the hotel name;
+       
+       3. Extract the raw address, phone number, and fax number into a vector, in that order;
+       
+       4. Extract and clean the address, phone number, and fax number from the contact vector;
+       
+       5. Extract the latitude and longitude of the hotel and output as character vector;
+       
+       6. Extract the hotel and room features and output as character vector;
+       
+       7. Extract the hotel details from lists and output as named character vector;
+       
+       8. Extract the relevant information from the hotel webpages into a data frame;
 
 
 
@@ -115,45 +116,46 @@ O. Check the inconsistent entries by visual inspection;
 
 P. Define and call a function to standardize hotel details;
 
-Q. Write the data frame to disk.
+Q. Write the data frame to disk.\newline
 
 
+\quad\newline
 
-
-get_dannys.R
+**get_dannys.R**
 
 
 We downloaded xml data from the Where2GetIt API through steps as follows:
 
-1. Create a variable named 'to_get' to read the file 'dannys_coords.csv' and create a directory called 'data/dennys/' in order to store API information later;
+A. Create a variable named 'to_get' to read the file 'dannys_coords.csv' and create a directory called 'data/dennys/' in order to store API information later;
 
-2. Create a function named query_api that has following features:
+B. Create a function named query_api that it has following features:
 
-  a. Input: coordinate, a data frame row containing a longitude, a latitude, and a search radius;
+   a. Input: coordinate, a data frame row containing a longitude, a latitude, and a search radius;
      
             key (default=api_key), a valid API key allowing data scraping;
             
             limit (default=1000), an upper bound for the number of search results returned.
 
-  b. Output: Nothing; an XML file containing the results of the API query is downloaded to disk.
+   b. Output: Nothing; an XML file containing the results of the API query is downloaded to disk.
  
 
-3. Run query_api on the rows of the to_get data frame to download XML files containing Dennys locations.
+C. Run query_api on the rows of the to_get data frame to download XML files containing Dennys locations.\newline
 
 
+\quad\newline
 
-parse_dannys.R
+**parse_dannys.R**
 
 
-We parse danny's data with following steps:
+We parse danny's data with the following steps:
 
-1.Read in the xml files to a list;
+A. Read in the xml files to a list;
 
-2.Create a logical vector for subsetting the unique store ID numbers;
+B. Create a logical vector for subsetting the unique store ID numbers;
 
-3.Extract the results nodes for the unique Dennys locations;
+C. Extract the results nodes for the unique Dennys locations;
 
-4.Create a function named scrape_tag() such that it has following features:
+D. Create a function named scrape_tag() such that it has following features:
 
    a.Input: tag, a particular xml tag whose value is to be extracted;
  
@@ -161,7 +163,7 @@ We parse danny's data with following steps:
    
    b.Output: the value of the xml tag.
 
-5. Create a function named scrape_dennys() such that it has following features:
+E. Create a function named scrape_dennys() such that it has following features:
 
    a.Input: result, a particular result node.
     
@@ -177,8 +179,12 @@ We parse danny's data with following steps:
       
             (5) longitude, the longitude of the Dennys location.
            
-6. Extract the relevant information from the search results into a data frame;
+F. Extract the relevant information from the search results into a data frame;
 
-7. Subset the data frame to include only US locations (those with a state abbreviation and ZIP code);
+G. Subset the data frame to include only US locations (those with a state abbreviation and ZIP code);
 
-8. Write the data frame to disk and save it as 'dennys.Rdata'.
+H. Write the data frame to disk and save it as 'dennys.Rdata'.
+
+
+
+
