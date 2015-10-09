@@ -4,10 +4,13 @@ library(magrittr)
 library(stringr)
 library(plyr)
 
+#Read data from 'dennys_coords.csv'
 to_get = read.csv('dennys_coords.csv', header=F)
+#Name to_put as directory 'data/dennys/' 
 to_put = 'data/dennys/'
+#Create the directory to_put 
 dir.create(to_put, recursive=T, showWarnings=F)
-
+#List the api key
 api_key = '6B962D40-03BA-11E5-BC31-9A51842CA48B'
 
 
@@ -34,8 +37,12 @@ query_api = function(coordinate, key=api_key, limit=1000) {
                  '</latitude><country>US</country></geoloc></geolocs><stateonly>1</stateonly><searchradius>',
                  radius,
                  '</searchradius></formdata></request>')
+  
+# Generate the query that consists of elements from coordinate and download it into the directory saved as 'to_put'  
   download.file(query, destfile=paste0(to_put, 'longitude_', longitude, '.xml'), method='wget', quiet=T)
+# Suspend exucution of R for 0.25 seconds
   Sys.sleep(0.25)
 }
 # Run query_api on the rows of the to_get data frame to download XML files containing Dennys locations.
+# a_ply takes arguments (.data, .margins, .fun)
 a_ply(to_get, 1, query_api)
