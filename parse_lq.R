@@ -6,11 +6,14 @@ library(plyr)
 
 # Read in the html files to a list and remove the duplicate link if present.
 to_get = list.files('data/lq/')
+# Remove the null addresses if they are in 'to_get'
+# Otherwise resave to_get as a list 
 if('hotel-details.null.address.html' %in% to_get) {
   to_get = to_get[-match('hotel-details.null.address.html', to_get)] %>% as.list(.)
 } else {
   to_get = as.list(to_get)
 }
+# Name variable to_put as directory 'data/'
 to_put = 'data/'
 
 
@@ -61,6 +64,7 @@ scrape_hotel = function(page) {
     html_text %>%
     str_extract_all(pattern='^ .* \\\n', simplify=T) %>%
     str_sub(start=2, end=-3)
+  # Only extract the amenities that has string length greater than 0
   amenities = amenities[str_length(amenities)>0]
   
   # Extract the hotel details from lists and output as named character vector.
@@ -78,6 +82,7 @@ scrape_hotel = function(page) {
     lapply(FUN=paste, collapse=':') %>%
     unlist
   
+  # Return info as a vector that contains previously saved variables
   return(info = list(name=name, 
                      address=address, 
                      phone=phone, 
@@ -90,6 +95,7 @@ scrape_hotel = function(page) {
 
 # Extract the relevant information from the hotel webpages into a data frame.
 hotel_info = to_get %>% 
+# Apply sapply function onto 'to_get', transpose and resave the resulting dataframe
   sapply(FUN=scrape_hotel) %>% 
   t %>% 
   as.data.frame(stringsAsFactors=F) 
@@ -203,5 +209,5 @@ if(nrow(hotel_info)==869) {
   hotel_info$details[details]
 }
 
-# Write the data frame to disk.
+# Write the data frame to disk and save it as 'lq.Rdata'
 save(file=paste0(to_put, 'lq.Rdata'), list=c('hotel_info'))
