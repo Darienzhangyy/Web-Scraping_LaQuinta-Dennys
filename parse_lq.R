@@ -49,6 +49,8 @@ scrape_hotel = function(page) {
   
   # Extract and clean the address, phone number, and fax number from the contact vector.
   address = str_split(contact[1], ' *\n *') %>% unlist %>% paste(collapse=' ')
+  state   = suppressMessages(str_extract(address, perl('(?<=, )[A-Z][A-Z](?= \\d{5})')))
+  zip     = suppressMessages(str_extract(address, perl('\\d{5}(?=(-\\d{4}|$))')))
   phone   = str_extract(contact[2], ' .*$') %>% str_trim
   fax     = str_extract(contact[3], ' .*$') %>% str_trim
   
@@ -85,6 +87,8 @@ scrape_hotel = function(page) {
   # Return info as a vector that contains previously saved variables
   return(info = list(name=name, 
                      address=address, 
+                     state=state,
+                     zip=zip,
                      phone=phone, 
                      fax=fax, 
                      latitude=latlong[1], 
@@ -209,5 +213,11 @@ if(nrow(hotel_info)==869) {
   hotel_info$details[details]
 }
 
-# Write the data frame to disk and save it as 'lq.Rdata'
+# Unlist columns into character vectors.
+to_characters = which(colnames(hotel_info) %in% c('amenities', 'details'))
+hotel_info = apply(hotel_info[,-to_characters], 2, unlist) %>% 
+  as.data.frame(stringsAsFactors=F) %>%
+  cbind(hotel_info[,c('amenities', 'details')])
+
+# Write the data frame to disk and save it as 'lq.Rdata'.
 save(file=paste0(to_put, 'lq.Rdata'), list=c('hotel_info'))

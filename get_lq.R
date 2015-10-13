@@ -34,28 +34,20 @@ scrape_list = function(page) {
   
   # Extract the country/state abbreviations and replace NA with "NA".
   rows_names = rows %>% 
-              html_attr('name') %>% 
-              str_replace_na
+               html_attr('name') %>% 
+               str_replace_na
 
-  # Extract the index from `rows` corresponding to the first entry after the US label.
-  begin = str_detect(rows_names, '^US$') %>% 
-          seq(length(rows))[.] %>% 
-          sum(1)
+  # Extract the indexes from `rows` corresponding to the start of each state's hotel list.
+  state_starts = seq(length(rows))[rows_names %in% states] + 2
   
-  # Extract the index from `rows` corresponding to the last entry before the Mexico label.
-  end = str_detect(rows_names, '^MX$') %>% 
-        seq(length(rows))[.] %>% 
-        sum(-1)
+  # Extract the indexes from `rows` corresponding to the end of each state's hotel list.
+  state_abbrs = rows_names[rows_names!='NA']
+  next_states = state_abbrs[which(state_abbrs==states) + 1]
+  state_ends = seq(length(rows))[rows_names %in% next_states] - 1
   
-  # Extract the indexes from `rows` corresponding to the state abbreviations.
-  state_names = seq(length(rows))[rows_names %in% states]
-  
-  # Extract the indexes from `rows` immediately following the state abbreviations, 
-  # which correspond to the "Back To Top" links.
-  state_names = sort(c(state_names, (state_names + 1)))
-  
-  # Extract the indexes from `rows` corresponding to all American hotels.
-  state_rows = setdiff(seq(begin, end, 1), state_names)
+  # Extract the indexes from `rows` corresponding to the indicated hotels.
+  state_rows = apply(cbind(state_starts, state_ends), 1, function(row) { seq(row[1], row[2], 1) } ) %>%
+                 unlist
   
   # Extract the links from the nodes indexed by `state_rows`.
   links = rows[state_rows] %>% 
@@ -78,7 +70,7 @@ html_download = function(link) {
   download.file(link, destfile=paste0(to_put, basename(link)), quiet=T)
   
   # Direct the computer to rest for a quarter of a second after downloading the webpage.
-  Sys.sleep(0.25)
+  Sys.sleep(5)
 }
 
 

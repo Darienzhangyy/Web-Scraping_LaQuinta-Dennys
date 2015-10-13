@@ -69,11 +69,19 @@ dennys_info = ldply(store_nodes, scrape_dennys)
 colnames(dennys_info) = c('clientkey', 'address', 'phone', 'latitude', 'longitude')
 
 # Subset the data frame to include only US locations (those with a state abbreviation and ZIP code).
-has_zip = str_detect(dennys_info$address, '([A-Z][A-Z] \\d{5}$)|([A-Z][A-Z] \\d{5}(-| )\\d{4}$)') %>% 
+has_zip = str_detect(dennys_info$address, '([A-Z][A-Z] \\d{5}($|-\\d{4}$|\\d{4}$))') %>% 
           llply(function(row) { row[length(row)] } ) %>% 
           unlist
-# subset dennys_info according to has_zip and rename it as dennys_info
 dennys_info = dennys_info[has_zip,]
+
+# Extract the ZIP code and state into separate columns.
+dennys_info$state = suppressMessages(str_extract(dennys_info$address, 
+                                                 perl('(?<=, )[A-Z][A-Z](?= \\d{5})')))
+dennys_info$zip = suppressMessages(str_extract(dennys_info$address, 
+                                               perl('\\d{5}(?=(-\\d{4}|$))')))
+
+# Reorder the data frame.
+dennys_info = dennys_info[,c('clientkey', 'address', 'state', 'zip', 'phone', 'latitude', 'longitude')]
 
 # Write the data frame to disk and save it as 'dennys.Rdata'.
 save(file=paste0(to_put, 'dennys.Rdata'), list=c('dennys_info'))

@@ -23,8 +23,8 @@ api_key = '6B962D40-03BA-11E5-BC31-9A51842CA48B'
 # Output: Nothing; an XML file containing the results of the API query is downloaded to disk.
 
 query_api = function(coordinate, key=api_key, limit=1000) {
-  longitude = coordinate[,2]
-  latitude = coordinate[,1]
+  longitude = coordinate[,1]
+  latitude = coordinate[,2]
   radius = coordinate[,3]
   query = paste0('https://hosted.where2getit.com/dennys/responsive/ajax?&xml_request=<request><appkey>',
                  key,
