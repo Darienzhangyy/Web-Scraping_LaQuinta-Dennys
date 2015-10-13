@@ -50,7 +50,7 @@ scrape_hotel = function(page) {
   # Extract and clean the address, phone number, and fax number from the contact vector.
   address = str_split(contact[1], ' *\n *') %>% unlist %>% paste(collapse=' ')
   state   = suppressMessages(str_extract(address, perl('(?<=, )[A-Z][A-Z](?= \\d{5})')))
-  zip     = suppressMessages(str_extract(address, perl('\\d{5}(?=(-\\d{4}|$))')))
+  zip     = suppressMessages(str_extract(address, perl('\\d{5}(?=( \\d{4}|-\\d{4}|$))')))
   phone   = str_extract(contact[2], ' .*$') %>% str_trim
   fax     = str_extract(contact[3], ' .*$') %>% str_trim
   
