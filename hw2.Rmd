@@ -138,10 +138,8 @@ query_sunlight = function(row, folder, key=sunlight_apikey) {
                  row$longitude,
                  '&apikey=',
                  key)
-  if(!(file.exists(paste0(to_put, folder, '/', row$id, '.json')))) {
-    download.file(query, destfile=paste0(to_put, folder, '/', row$id, '.json'), method='wget', quiet=T)
-    Sys.sleep(0.25)
-  }  
+  download.file(query, destfile=paste0(to_put, folder, '/', row$id, '.json'), method='wget', quiet=T)
+  Sys.sleep(0.25)
 }
 
 
