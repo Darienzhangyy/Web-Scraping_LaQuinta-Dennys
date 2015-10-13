@@ -37,7 +37,7 @@ The constructed data frame has the following column names:
 
 \quad\newline
 
-#3 get_dennys.R
+## get_dennys.R
 
 This document implements steps to download xml data from the Where2GetIt API and store them into 'data/dennys/' directory. We first implement a function named query_api that it takes input as 'coordinate' <a data frame row containing a longitude, a latitude, and a search radius>, 'key' (default=api_key) <a valid API key allowing data scraping>, and 'limit' (default=1000) <an upper bound for the number of search results returned>. It then returns an output of XML file containing the results of the API query that is downloaded to disk. Finally we run query_api on the rows of the 'dennys_coords.csv' data frame to download XML files containing Dennys locations.\newline
 
