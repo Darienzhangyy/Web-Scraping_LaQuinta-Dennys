@@ -1,0 +1,611 @@
+---
+title: "hw2"
+output: pdf_document
+---
+
+
+
+## get_lq.R
+
+This document implements procedures to download websites of LaQuinta hotels that primarity operates in the United States and store those links into directory "data/lq/". We extract websites of those hotels by creating a function named 'scrape_list' that it has the following functionalty: (1) matching US state names from csv file to US state abbreviations on website to identify American hotels; (2) extracting country/state abbreviations and replace NA with "NA""; (3) extracting the indexes from `rows` corresponding to the first entry after the US label and before the Mexico label; (4) extracting the indexes from `rows` corresponding to the state abbreviations; (5) extracting the indexes from `rows` immediately following the state abbreviations and corresponding to all American hotels; (6) extracting the links from the nodes indexed by `state_rows`and return those links. Finally we implement the 'html_download' function to download those links that are extracted by 'Scrape_list' and store them into directory "data/lq/". \newline
+
+  
+\quad\newline
+
+## parse_lq.R
+
+This documents primary parses LaQuinta's hotel information of "name", "address", "phone", "fax", "latitude", "longtitude", "amenities", and "details" and store them as lq.Rdata in the "data/" directory. We first create a function named 'scrape_hotel' that it takes input as 'page' <full html file for a particular La Quinta hotel's webpage>, and returns output which is a list of 8 character vectors as above. After obtaining  the relative information, we then (1) check hotel names and addresses by visual inspection; (2) check hotel phone numbers by adherence to "1-xxx-xxx-xxxx" pattern and correct as needed; (3) replace " " with "-" corrects all flaws; (4) check hotel fax numbers by adherence to "1-xxx-xxx-xxxx" pattern and correct as needed; (5) replace " " with "-" corrects most - but not all - flaws; (6) insert "-" in the last seven digits corrects one more flaw; (7) trim leading zeroes corrects one more flaw; (8) convert three remaining flaws involve missing data to NAs;(9) check hotel names, addresses, hotel amenities, details correct and consistent as needed;(10) define and call a function to standardize hotel details and store those information into 'data/' directory. 
+
+The constructed data frame has the following column names:
+   
+   (1) name, the name of the hotel;
+
+   (2) address, the address of the hotel;
+
+   (3) phone, the phone number of the hotel;
+
+   (4) fax, the fax number of the hotel;
+
+   (5) latitude, the latitude of the hotel location;
+
+   (6) longitude, the longitude of the hotel location;
+
+   (7) amenities, the features of the hotel and the room;
+
+   (8) details, the hotel details (# rooms, floors, etc.). \newline
+
+
+\quad\newline
+
+## get_dennys.R
+
+This document implements steps to download xml data from the Where2GetIt API and store them into 'data/dennys/' directory. We first implement a function named query_api that it takes input as 'coordinate' <a data frame row containing a longitude, a latitude, and a search radius>, 'key' (default=api_key) <a valid API key allowing data scraping>, and 'limit' (default=1000) <an upper bound for the number of search results returned>. It then returns an output of XML file containing the results of the API query that is downloaded to disk. Finally we run query_api on the rows of the 'dennys_coords.csv' data frame to download XML files containing Dennys locations.\newline
+
+
+\quad\newline
+
+## parse_dennys.R
+
+This documents parse denny's stores data and stores corresponding information as 'dennys.Rdata' in the 'data/' directory. We implement the procedures by (1) letting R read in xml file to a list;(2) creating a logical vector for subsetting the unique store ID numbers;(3) extracting the results nodes for the unique Dennys locations;(4) creating a function named scrape_tag() that it takes inputs 'tag' <a particular xml tag whose value is to be extracted>, and 'result'<a particular result node>, and returns an output that contains the value of the xml tag. We also create a function named scrape_dennys() that it takes input 'result' <a particular result node> and returns output as a character vector with five elements:
+            
+            (1) clientkey, a unique store ID;
+            
+            (2) address, the address of the Dennys location;
+            
+            (3) phone, the phone number of the Dennys location;
+            
+            (4) latitude, the latitude of the Dennys location;
+      
+            (5) longitude, the longitude of the Dennys location.
+           
+We then extract the relevant information from the search results into a data frame, subset the data frame to include only US locations (those with a state abbreviation and ZIP code) and store them into 'data/' directory. \newline
+
+\quad\newline
+
+
+
+## Distance Analysis
+
+
+We calculate and aggregate the paired distances between LaQuinta and Denny's in different locations according to divisions of congressional districts, US disctrict courts and states. We first calculate paired distances using haversine formula and store the distance results into stateDistance.Rdata in '/data/' directory. We also visualize the number of LaQuinta and Denny's in each state and their corresponding distances in each state. The link to the visualization is here:http://rpubs.com/Darien/117132 
+
+\quad\newline
+Caculate distances of LaQuita and Denny's and visulize the results:
+
+```{r setup, results='asis', echo=F, warning=F, message=F}
+load('data/lq.Rdata'); load('data/dennys.Rdata')
+
+# Create list of required packages.
+packages_required = list('rvest', 'magrittr', 'stringr', 'plyr', 'ggplot2', 'jsonlite', 'googleVis')
+
+
+# package_checker()
+#############################################################################################
+# Input: package, the name of a required R package.
+#
+# Output: Nothing; following installation if necessary, the package is loaded.
+
+package_checker = function(package) {
+  if(!(package %in% installed.packages()[,'Package'])) {
+    install.packages(package, repos='http://cran.rstudio.com/') 
+  }
+  suppressPackageStartupMessages(library(package, character.only=T, quietly=T))
+}
+
+# Run package_checker to (if necessary, install, and) load packages.
+invisible(lapply(packages_required, package_checker))
+
+#############################################################################################
+
+# Add ID columns to main data frames.
+dennys_info$id = nrow(dennys_info) %>% 
+  seq %>% 
+  as.character %>% 
+  str_pad(width=4, side='left', pad='0')
+hotel_info$id = nrow(hotel_info) %>% 
+  seq %>% 
+  as.character %>% 
+  str_pad(width=4, side='left', pad='0')
+```
+
+```{r congressional_district, results='asis', echo=F, warning=F, message=F}
+# Create directories into which JSON files will be downloaded.
+to_put = 'data/districts/'
+dir.create(to_put, recursive=T, showWarnings=F)
+dir.create(paste0(to_put, 'dennys'), recursive=T, showWarnings=F)
+dir.create(paste0(to_put, 'lq'), recursive=T, showWarnings=F)
+
+# Create a data frame with names of folders and data frames, used below.
+to_do = data.frame(folder=c('dennys', 'lq'), 
+                   frame=c('dennys_info', 'hotel_info'), stringsAsFactors=F)
+
+# API key for the Sunlight Foundation's Sunlight Congress API.
+sunlight_apikey = '9e01460f6df44599bec682478cd13fdc'
+
+
+# query_sunlight()
+#############################################################################################
+# Input: row, a data frame row containing the longitude and latitude of the location;
+#        folder, an identifier for the type of location used in file names;
+#        key (default=sunlight_apikey), a valid API key from the Sunlight Foundation.
+#
+# Output: Nothing; an XML file containing the results of the API query is downloaded to disk.
+
+query_sunlight = function(row, folder, key=sunlight_apikey) {
+  query = paste0('congress.api.sunlightfoundation.com/legislators/locate?latitude=',
+                 row$latitude,
+                 '&longitude=',
+                 row$longitude,
+                 '&apikey=',
+                 key)
+  if(!(file.exists(paste0(to_put, folder, '/', row$id, '.json')))) {
+    download.file(query, destfile=paste0(to_put, folder, '/', row$id, '.json'), method='wget', quiet=T)
+    Sys.sleep(0.25)
+  }  
+}
+
+
+# to_get()
+#############################################################################################
+# Input: folder, a file folder containing downloaded JSON files.
+#
+# Output: A list of all JSON files in the folder.
+
+to_get = function(folder) {
+  list.files(paste0(to_put, folder, '/')) %>% 
+    paste0(paste0(to_put, folder, '/'), .) %>% 
+    as.list(.)
+}
+
+
+# parse_json()
+#############################################################################################
+# Input: file, the filename of a JSON file.
+#
+# Output: info, a character vector containing the name of the congressional representative,   
+#               the state and congressional district number (XX-#), and party affiliation.
+
+parse_json = function(file) {
+  json = suppressWarnings(readLines(file))
+  fields = json %>% 
+    str_split('\\{') %>%
+    unlist %>%
+    str_subset('chamber\\":\\"house') %>%
+    str_split('\\",\\"|,\\"') %>% 
+    unlist %>% 
+    str_replace_all('\\":\\"', ':: ') %>% 
+    str_replace_all('\\":', ':: ') %>% 
+    str_c(collapse='   ')
+  state = fields %>% 
+    str_extract('state:: [A-Z][A-Z]') %>% 
+    str_extract('[A-Z][A-Z]$')
+  district = fields %>% 
+    str_extract('district:: (\\d{1})+') %>% 
+    str_extract('(\\d{1})+$') %>% 
+    str_pad(2, side='left', pad='0') %>%
+    paste(state, ., sep='-')
+  party = fields %>% 
+    str_extract('party:: [RDI]') %>% 
+    str_extract('[RDI]')
+  first_name = fields %>% 
+    str_extract('first_name::.*gender::') %>% 
+    str_split_fixed(' +', 3) %>% 
+    .[,2]
+  last_name = fields %>% 
+    str_extract('last_name::.*middle_name::') %>% 
+    str_split_fixed(' +', 3) %>% 
+    .[,2]
+  name = paste(first_name, last_name)
+  info = c(representative=name, district=district, party=party)
+  return(info)
+}
+
+
+# get_districts()
+#############################################################################################
+# Input: row, a data frame row containing the names of a data frame and a folder.
+#
+# Output: A list of character vectors containing congressional district information.
+
+get_districts = function(row) {
+  # Run query_sunlight on the rows of a data frame to download JSON files with congressional 
+  # district information.
+  a_ply(get(row$frame), 1, query_sunlight, row$folder)
+  
+  # Run parse_json on the downloaded JSON files to extract congressional district information 
+  # into a character vector.
+  return(llply(to_get(row$folder), parse_json))
+}
+
+# Run get_districts to create a two-element list containing congressional district information 
+# for each data frame.
+districts = alply(to_do, 1, get_districts)
+dennys_info = cbind(dennys_info, do.call(rbind, districts[[1]]), stringsAsFactors=F)
+hotel_info = cbind(hotel_info, do.call(rbind, districts[[2]]), stringsAsFactors=F)
+```
+
+```{r district_court, results='asis', echo=F, warning=F, message=F}
+# scrape_district_court()
+#############################################################################################
+# Input: zip, the zip code for a particular location.
+#
+# Output: A character string containing the US federal district court with jurisdiction over
+#         a given zip code.
+
+scrape_district_court = function(zip) {
+  court = paste0('http://www.uscourts.gov/court-locator/zip/',
+                 zip,
+                 '/court/district') %>%
+    read_html %>% 
+    html_nodes(xpath='//p[@class="grouped-court"]//a') %>% 
+    html_text %>% 
+    .[1] %>% 
+    str_sub(start=3) %>% 
+    str_trim
+  Sys.sleep(0.25)
+  return(court)
+}
+
+# Run scrape_district_court to add columns containing federal district court jurisdiction to 
+# each data frame.
+hotel_info$court = llply(hotel_info$zip, scrape_district_court) %>% 
+  unlist
+dennys_info$court = llply(dennys_info$zip, scrape_district_court) %>% 
+  unlist
+```
+
+```{r census_block, results='asis', echo=F, warning=F, message=F}
+# Create directory into which XML files will be downloaded.
+to_put = 'data/census_tracts/'
+dir.create(to_put, recursive=T, showWarnings=F)
+
+
+# query_fcc()
+#############################################################################################
+# Input: row, a row from one of the info data frames;
+#        type, a character string containing either 'LaQuinta_' or 'Dennys_'.
+#
+# Output: Nothing, an XML file is downloaded from an API at the Federal Communications Commission.
+
+query_fcc = function(row, type) {
+  query = paste0('http://data.fcc.gov/api/block/find?latitude=',
+                 row$latitude,
+                 '&longitude=',
+                 row$longitude,
+                 '&showall=false')
+  download.file(query, destfile=paste0(to_put, type, row$id, '.xml'), method='wget', quiet=T)
+  Sys.sleep(0.25)
+}
+
+# Run query_fcc to download XML files containing US Census Bureau FIPS codes at the block level.
+a_ply(hotel_info, 1, query_fcc, type='LaQuinta_')
+a_ply(dennys_info, 1, query_fcc, type='Dennys_')
+
+# Create a list with the names of all downloaded XML files, used below.
+to_get = list.files(to_put, pattern='xml') %>% as.list
+
+
+# get_fips()
+#############################################################################################
+# Input: result, an XML file.
+#
+# Output: A character vector containing:
+#         id, the row id;
+#         type, either 'Dennys' or 'LaQuinta';
+#         fips, the full FIPS code, uniquely identifying a census block;
+#         county, the five-digit portion of the FIPS code referring to state and county.
+
+get_fips = function(result) {
+  id = suppressMessages(str_extract(result, perl('(?<=_).*(?=\\.)')))
+  fips = read_xml(paste0(to_put, result)) %>% as_list %>% .[[1]] %>% attr('FIPS')
+  county = read_xml(paste0(to_put, result)) %>% as_list %>% .[[2]] %>% attr('FIPS')
+  type = suppressMessages(str_extract(result, perl('.*(?=_)')))
+  return(c(id=id, type=type, fips=fips, county=county))
+}
+
+# Run get_fips to extract to a data frame block- and county-level FIPS codes for every location.
+fips_frame = llply(to_get, get_fips) %>% do.call(rbind, .) %>% as.data.frame(stringsAsFactors=F)
+
+# Split the fips_frame into separate data frames for Dennys and La Quinta.
+dennys_fips = split(fips_frame, fips_frame$type)[[1]]
+hotel_fips = split(fips_frame, fips_frame$type)[[2]]
+
+# Merge the separate FIPS data frames with their respective parent data frames, adding columns
+# for type, FIPS, and county.
+dennys_info = merge(dennys_info, dennys_fips, by='id')
+hotel_info = merge(hotel_info, hotel_fips, by='id')
+```
+
+```{r setup_distance, results='asis', echo=F, warning=F, message=F}
+# format_coords()
+#############################################################################################
+# Input: row, a row from the indexes data frame, corresponding to one possible combination of
+#             La Quinta and Dennys location ids at a given level of aggregation;
+#        data.1, a data frame whose rows contain a location id, latitude, and longitude;
+#        data.2, a data frame whose rows contain a location id, latitude, and longitude.
+#
+# Output: lqd_distance, a data frame row containing the pair of location coordinates for the
+#                       provided row from the indexes data frame.
+
+format_coords = function(row, data.1, data.2) {
+  lqd_distance = cbind(data.1[row[,1],,drop=F], data.2[row[,2],,drop=F])
+  colnames(lqd_distance) = c('id1', 'lat1', 'lon1', 'id2', 'lat2', 'lon2')
+  return(lqd_distance)
+}
+
+
+# haversine()
+#############################################################################################
+# Input: row, a row from the coords data frame, containing a La Quinta location id/lat/long 
+#             and a Dennys location id/lat/long;
+#        metric, a logical indicating whether to calculate distances using metric units (km) 
+#               (default is FALSE, using miles).
+#
+# Output: distance, the great circle distance between the pair of locations, in miles or km.
+
+haversine = function(row, metric=F) {
+  # Check that aspace package is installed and install if necessary.
+  if(!('aspace' %in% installed.packages()[,'Package'])) {
+    install.packages('aspace', repos='http://cran.rstudio.com/') 
+  }
+  require(aspace)
+  
+  # Provide output in kilometers if directed.
+  if(metric) {
+    radius = 6378.1
+  } else {
+    radius = 3963.17
+  }
+  
+  # Implement the haversine formula with degree-based input.
+  a = sin_d((row$lat1 - row$lat2)/2)^2 + 
+    cos_d(row$lat1) * cos_d(row$lat2) * 
+    sin_d((row$lon1 - row$lon2)/2)^2
+  distance = 2 * atan2(sqrt(a), sqrt(1 - a)) * radius
+  
+  return(distance)
+}
+
+
+# get_coords()
+#############################################################################################
+# Input: value, one unit from the specified level of aggregation containing at least one La
+#               Quinta AND at least one Dennys;
+#        var, a character string indicating the column to use as the aggregation level;
+#        met, a logical indicating whether to calculate distances using metric units (km) 
+#             (default is FALSE, using miles).
+#
+# Output: out, a data frame containing columns with ids for La Quinta and Dennys (see below 
+#              in distances_by_cluster for description), and the distance between each pair.
+
+get_coords = function(value, var=variable, met=metric) {
+  lq_lat = hotel_info$latitude[which(hotel_info[,var]==value)] %>% as.numeric
+  lq_lon = hotel_info$longitude[which(hotel_info[,var]==value)] %>% as.numeric
+  d_lat = dennys_info$latitude[which(dennys_info[,var]==value)] %>% as.numeric
+  d_lon = dennys_info$longitude[which(dennys_info[,var]==value)] %>% as.numeric
+  la_quinta = cbind(id=seq(length(lq_lat)), latitude=lq_lat, longitude=lq_lon) %>% as.data.frame
+  dennys = cbind(id=seq(length(d_lat)), latitude=d_lat, longitude=d_lon) %>% as.data.frame
+  indexes = expand.grid(la_quinta$id, dennys$id)
+  coords = adply(indexes, 1, format_coords, data.1=la_quinta, data.2=dennys)
+  out = adply(coords, 1, haversine, metric=met) %>% .[,c('id1', 'id2', 'V1')]
+  colnames(out) = c('lq_id', 'd_id', 'distance')
+  return(out)
+}
+
+
+# distances_by_cluster()
+#############################################################################################
+# Input: variable, a character string indicating the column to use as an aggregation level;
+#        data1, the first data frame, hotel_info by default;
+#        data2, the second data frame, dennys_info by default;
+#        all, a logical indicating whether all pair distances should be returned or a 
+#             a summary() of these pair distances for each unit (default is TRUE);
+#        metric, a logical indicating whether to calculate distances using metric units (km) 
+#               (default is FALSE, using miles).
+#
+# Output: out, a data frame containing columns
+#         if(all=F): variable (the cluster unit),
+#                    Min., 1st Qu., Median, Mean, 3rd Qu., Max.
+#         if(all=T): lq_id (a La Quinta location id unique to the level of aggregation),
+#                    d_id (a Dennys location id unique to the level of aggregation),
+#                    distance (the distance between the La Quinta-Dennys pair),
+#                    cluster (the cluster unit).
+
+distances_by_cluster = function(variable, data1=hotel_info, data2=dennys_info, all=T, metric=F) {
+  stopifnot(variable %in% colnames(data1) & variable %in% colnames(data2))
+  clusters = intersect(unique(data1[,variable]), unique(data2[,variable])) %>% as.list
+  coords = llply(clusters, get_coords, var=variable, met=metric)
+  names(coords) = clusters
+  if(all) {
+    out = do.call(rbind, coords)
+    out$cluster = rownames(out)
+    name_dots = str_detect(out$cluster, '\\.')
+    out$cluster[name_dots] = suppressMessages(str_extract(out$cluster[name_dots], 
+                                                          perl('^.+(?=\\.)')))
+  } else {
+    out = ldply(coords, function(value) { summary(value$distance) } )
+    out = out[order(out$.id),]
+    colnames(out)[1] = variable
+  }
+  return(out)
+}
+
+
+# summarize_by_cluster()
+#############################################################################################
+# Input: df, a _distances data frame containing all distance pairs.
+#
+# Output: out, a data frame containing the cluster unit and columns for Min., 1st Qu., Median, 
+#              Mean, 3rd Qu., Max..
+
+summarize_by_cluster = function(df) {
+  out = tapply(df$distance, df$cluster, summary) %>% 
+    do.call(rbind, .) %>% 
+    as.data.frame(stringsAsFactors=F)
+  out$cluster = rownames(out)
+  return(out)
+}
+```
+
+```{r calculate_distance, results='asis', echo=F, warning=F, message=F}
+# Run distances_by_cluster on multiple levels of aggregation: census block, zip code, county,
+# federal district court jurisdiction, congressional district (CD), and partisan-CDs.
+fips_distances = distances_by_cluster('fips')
+zip_distances = distances_by_cluster('zip')
+county_distances = distances_by_cluster('county')
+state_distances = distances_by_cluster('state')
+court_distances = distances_by_cluster('court')
+cd_distances = distances_by_cluster('district')
+party_distances = distances_by_cluster('party')
+party_distances_summary = distances_by_cluster('party', all=F)
+
+# Create a distance distribution plot and an average distance distribution plot for each 
+# level of aggregation, if non-NULL.
+if(is.null(fips_distances)) { 
+  fips_density_all = fips_density_average = NULL
+} else {
+  fips_density_all = ggplot(data=fips_distances, aes(x=distance)) + 
+    geom_density(color='#00BA38', fill='#00BA38') +
+    labs(x=paste0('Distance (miles); n=', nrow(fips_distances)), y=NULL, 
+         title='Distribution of La Quinta-Dennys distances \nwithin FIPS code')
+  fips_density_average = ggplot(data=summarize_by_cluster(fips_distances), aes(x=Mean)) + 
+    geom_density(color='#00BA38', fill='#00BA38') +
+    labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(fips_distances))), y=NULL, 
+         title='Distribution of average La Quinta-Dennys \ndistances by FIPS code')
+}
+
+if(is.null(zip_distances)) {
+  zip_density_all = zip_density_average = NULL
+} else {
+  zip_density_all = ggplot(data=zip_distances, aes(x=distance)) + 
+    geom_density(color='#00BA38', fill='#00BA38') +
+    labs(x=paste0('Distance (miles); n=', nrow(zip_distances)), y=NULL, 
+         title='Distribution of La Quinta-Dennys distances \nwithin ZIP code')
+  zip_density_average = ggplot(data=summarize_by_cluster(zip_distances), aes(x=Mean)) + 
+    geom_density(color='#00BA38', fill='#00BA38') +
+    labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(zip_distances))), y=NULL, 
+         title='Distribution of average La Quinta-Dennys \ndistances by ZIP code')
+}
+
+if(is.null(county_distances)) { 
+  county_density_all = county_density_average = NULL
+} else {
+  county_density_all = ggplot(data=county_distances, aes(x=distance)) + 
+    geom_density(color='#00BA38', fill='#00BA38') +
+    labs(x=paste0('Distance (miles); n=', nrow(county_distances)), y=NULL, 
+         title='Distribution of La Quinta-Dennys distances \nwithin county')
+  county_density_average = ggplot(data=summarize_by_cluster(county_distances), aes(x=Mean)) + 
+    geom_density(color='#00BA38', fill='#00BA38') +
+    labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(county_distances))), y=NULL, 
+         title='Distribution of average La Quinta-Dennys \ndistances by county')
+}
+
+if(is.null(state_distances)) {
+  state_density_all = state_density_average = NULL
+} else {
+  state_density_all = ggplot(data=state_distances, aes(x=distance)) + 
+    geom_density(color='#00BA38', fill='#00BA38') +
+    labs(x=paste0('Distance (miles); n=', nrow(state_distances)), y=NULL, 
+         title='Distribution of La Quinta-Dennys distances \nwithin state')
+  state_density_average = ggplot(data=summarize_by_cluster(state_distances), aes(x=Mean)) + 
+    geom_density(color='#00BA38', fill='#00BA38') +
+    labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(state_distances))), y=NULL, 
+         title='Distribution of average La Quinta-Dennys \ndistances by state')
+}
+
+if(is.null(court_distances)) { 
+  court_density_all = court_density_average = NULL
+} else {
+  court_density_all = ggplot(data=court_distances, aes(x=distance)) + 
+    geom_density(color='#00BA38', fill='#00BA38') +
+    labs(x=paste0('Distance (miles); n=', nrow(court_distances)), y=NULL, 
+         title='Distribution of La Quinta-Dennys distances \nwithin district court jurisdiction')
+  court_density_average = ggplot(data=summarize_by_cluster(court_distances), aes(x=Mean)) + 
+    geom_density(color='#00BA38', fill='#00BA38') +
+    labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(court_distances))), y=NULL, 
+         title='Distribution of average La Quinta-Dennys \ndistances by district court jurisdiction')
+}
+
+if(is.null(cd_distances)) { 
+  cd_density_all = cd_density_average = NULL
+} else {
+  cd_density_all = ggplot(data=cd_distances, aes(x=distance)) + 
+    geom_density(color='#00BA38', fill='#00BA38') +
+    labs(x=paste0('Distance (miles); n=', nrow(cd_distances)), y=NULL, 
+         title='Distribution of La Quinta-Dennys distances \nwithin congressional district')
+  cd_density_average = ggplot(data=summarize_by_cluster(cd_distances), aes(x=Mean)) + 
+    geom_density(color='#00BA38', fill='#00BA38') +
+    labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(cd_distances))), y=NULL, 
+         title='Distribution of average La Quinta-Dennys \ndistances by congressional district')
+}  
+
+if(is.null(party_distances) | length(unique(party_distances$cluster))==1) { 
+  party_density_all = party_bar = NULL
+} else {
+  party_density_all = ggplot(data=party_distances, aes(x=distance, color=cluster, fill=cluster)) + 
+    geom_density(alpha=0.5) +
+    scale_color_manual(breaks=c('D', 'R'), labels=c('Democratic', 'Republican'), 
+                       values=c('#00BFC4', '#F8766D'), name='Partisan ID') +
+    scale_fill_manual(breaks=c('D', 'R'), labels=c('Democratic', 'Republican'), 
+                      values=c('#00BFC4', '#F8766D'), name='Partisan ID') +
+    labs(x=paste0('Distance (miles); n=', nrow(party_distances)), y=NULL, 
+         title='Distribution of La Quinta-Dennys distances \nby partisan ID of congressional representative')
+  party_bar = ggplot(data=summarize_by_cluster(party_distances), aes(x=cluster, y=Mean, fill=cluster)) + 
+    geom_bar(stat='identity', show_guide=F) + 
+    scale_x_discrete(breaks=c('D', 'R'), labels=c('Democratic', 'Republican')) + 
+    scale_fill_manual(breaks=c('D', 'R'), values=c('#00BFC4', '#F8766D')) +
+    labs(x='Partisan ID', y='Distance (miles)', 
+         title='Average La Quinta-Dennys distances by \npartisan ID of congressional representative')
+}
+
+# Create list of non-NULL plots for plotting.
+prefixes = c('fips', 'zip', 'county', 'state', 'court', 'cd')
+plot_objects = as.list(c(paste0(c(prefixes, 'party'), '_density_all'),
+                         c(paste0(prefixes, '_density_average'), 'party_bar')))
+plot_objects = llply(plot_objects, function(object) { !(is.null(get(object))) } ) %>% 
+               unlist %>% 
+               plot_objects[.]
+
+# Write non-NULL plots to disk, if such plots exist.
+if(length(plot_objects)>0) {
+  save_ggplot = function(object) {
+    ggsave(get(object), filename=paste0(object, '.pdf'), 
+           width=7, height=3.8, units='in')
+  }
+  l_ply(plot_objects, save_ggplot)
+}
+```
+
+```{r generate_geochart, results='asis', echo=F, warning=F, message=F}
+# count_by_state()
+#############################################################################################
+# Input: df, one of the primary data frames, either hotel_info or dennys_info;
+#        log, a logical indicating whether the count should be logged (default is TRUE).
+#
+# Output: out, a googleVis geochart object.
+
+count_by_state = function(df, log=T) {
+  if(log) {
+    counts = by(df, df$state, function(state) { c(state=state$state[1], count=log(nrow(state))) } )
+  } else {
+    counts = by(df, df$state, function(state) { c(state=state$state[1], count=nrow(state)) } )
+  }
+  counts = counts %>% 
+          do.call(rbind, .) %>%
+          as.data.frame(stringsAsFactors=F)
+  colnames(counts) = c('state', 'count')
+  counts$state = as.character(counts$state);  counts$count = as.numeric(counts$count)
+  out = gvisGeoChart(data=counts, locationvar='state', colorvar='count',
+                     options=list(region='US', displayMode='regions', resolution='provinces',
+                                  width=450, height=350))  
+  return(out)
+}
+
+# Run count_by_state on the primary data frames to generate googleVis geocharts and merge into one.
+hotel_plot = count_by_state(hotel_info)
+dennys_plot = count_by_state(dennys_info)
+geochart = gvisMerge(hotel_plot, dennys_plot, horizontal=T, tableOptions='cellspacing=5')
+
+# Write geochart to disk.
+save(file='counts_geochart.RData', geochart)
+```
