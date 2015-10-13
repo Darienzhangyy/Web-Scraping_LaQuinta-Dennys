@@ -12,7 +12,7 @@ This document implements procedures to download websites of LaQuinta hotels that
   
 \quad\newline
 
-**parse_lq.R**
+## parse_lq.R
 
 This documents primary parses LaQuinta's hotel information of "name", "address", "phone", "fax", "latitude", "longtitude", "amenities", and "details" and store them as lq.Rdata in the "data/" directory. We first create a function named 'scrape_hotel' that it takes input as 'page' <full html file for a particular La Quinta hotel's webpage>, and returns output which is a list of 8 character vectors as above. After obtaining  the relative information, we then (1) check hotel names and addresses by visual inspection; (2) check hotel phone numbers by adherence to "1-xxx-xxx-xxxx" pattern and correct as needed; (3) replace " " with "-" corrects all flaws; (4) check hotel fax numbers by adherence to "1-xxx-xxx-xxxx" pattern and correct as needed; (5) replace " " with "-" corrects most - but not all - flaws; (6) insert "-" in the last seven digits corrects one more flaw; (7) trim leading zeroes corrects one more flaw; (8) convert three remaining flaws involve missing data to NAs;(9) check hotel names, addresses, hotel amenities, details correct and consistent as needed;(10) define and call a function to standardize hotel details and store those information into 'data/' directory. 
 
