@@ -217,8 +217,11 @@ if(nrow(hotel_info)==869) {
 to_characters = which(colnames(hotel_info) %in% c('amenities', 'details'))
 one_third = apply(hotel_info[,-to_characters], 2, unlist) %>% 
             as.data.frame(stringsAsFactors=F)
-two_third = cbind(half_way, hotel_info[,c('amenities', 'details')])
+print(one_third)
+two_third = cbind(one_third, hotel_info[,c('amenities', 'details')])
+print(two_third)
 hotel_info = two_third
+print(hotel_info)
 
 # Write the data frame to disk and save it as 'lq.Rdata'.
 save(file=paste0(to_put, 'lq.Rdata'), list=c('hotel_info'))
