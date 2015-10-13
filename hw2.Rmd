@@ -70,7 +70,7 @@ We then extract the relevant information from the search results into a data fra
 We calculate and aggregate the paired distances between LaQuinta and Denny's in different locations according to divisions of congressional districts, US disctrict courts and states. We first calculate paired distances using haversine formula and store the distance results into stateDistance.Rdata in '/data/' directory. We also visualize the number of LaQuinta and Denny's in each state and their corresponding distances in each state. The link to the visualization is here:http://rpubs.com/Darien/117132 
 
 \quad\newline
-Caculate distances of LaQuita and Denny's and visulize the results:
+Caculate distances of LaQuita and Denny's and visualize the results:
 
 ```{r setup, results='asis', echo=F, warning=F, message=F}
 load('data/lq.Rdata'); load('data/dennys.Rdata')
