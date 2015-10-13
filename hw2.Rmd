@@ -344,23 +344,22 @@ format_coords = function(row, data.1, data.2) {
 # Output: distance, the great circle distance between the pair of locations, in miles or km.
 
 haversine = function(row, metric=F) {
-  # Check that aspace package is installed and install if necessary.
-  if(!('aspace' %in% installed.packages()[,'Package'])) {
-    install.packages('aspace', repos='http://cran.rstudio.com/') 
-  }
-  require(aspace)
-  
   # Provide output in kilometers if directed.
   if(metric) {
     radius = 6378.1
   } else {
     radius = 3963.17
   }
+
+  # Define function to convert degrees to radians.
+  degrees_to_radians = function(degree) {
+    return(degree * pi / 180)
+  }
   
-  # Implement the haversine formula with degree-based input.
-  a = sin_d((row$lat1 - row$lat2)/2)^2 + 
-    cos_d(row$lat1) * cos_d(row$lat2) * 
-    sin_d((row$lon1 - row$lon2)/2)^2
+  # Implement the haversine formula.
+  a = sin((degrees_to_radians(row$lat1) - degrees_to_radians(row$lat2))/2)^2 + 
+    cos(degrees_to_radians(row$lat1)) * cos(degrees_to_radians(row$lat2)) * 
+    sin((degrees_to_radians(row$lon1) - degrees_to_radians(row$lon2))/2)^2
   distance = 2 * atan2(sqrt(a), sqrt(1 - a)) * radius
   
   return(distance)
