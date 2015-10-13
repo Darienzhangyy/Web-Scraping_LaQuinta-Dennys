@@ -348,7 +348,7 @@ haversine = function(row, metric=F) {
   } else {
     radius = 3963.17
   }
-
+  
   # Define function to convert degrees to radians.
   degrees_to_radians = function(degree) {
     return(degree * pi / 180)
@@ -547,7 +547,7 @@ if(is.null(party_distances) | length(unique(party_distances$cluster))==1) {
                       values=c('#00BFC4', '#F8766D'), name='Partisan ID') +
     labs(x=paste0('Distance (miles); n=', nrow(party_distances)), y=NULL, 
          title='Distribution of La Quinta-Dennys distances \nby partisan ID of congressional representative')
-  party_bar = ggplot(data=summarize_by_cluster(party_distances), aes(x=cluster, y=Mean, fill=cluster)) + 
+  party_bar = ggplot(data=party_distances_summary, aes(x=cluster, y=Mean, fill=cluster)) + 
     geom_bar(stat='identity', show_guide=F) + 
     scale_x_discrete(breaks=c('D', 'R'), labels=c('Democratic', 'Republican')) + 
     scale_fill_manual(breaks=c('D', 'R'), values=c('#00BFC4', '#F8766D')) +
@@ -560,8 +560,8 @@ prefixes = c('fips', 'zip', 'county', 'state', 'court', 'cd')
 plot_objects = as.list(c(paste0(c(prefixes, 'party'), '_density_all'),
                          c(paste0(prefixes, '_density_average'), 'party_bar')))
 plot_objects = llply(plot_objects, function(object) { !(is.null(get(object))) } ) %>% 
-               unlist %>% 
-               plot_objects[.]
+  unlist %>% 
+  plot_objects[.]
 
 # Write non-NULL plots to disk, if such plots exist.
 if(length(plot_objects)>0) {
