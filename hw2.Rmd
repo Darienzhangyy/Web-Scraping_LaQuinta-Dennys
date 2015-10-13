@@ -606,6 +606,6 @@ hotel_plot = count_by_state(hotel_info)
 dennys_plot = count_by_state(dennys_info)
 geochart = gvisMerge(hotel_plot, dennys_plot, horizontal=T, tableOptions='cellspacing=5')
 
-# Write geochart to disk.
-save(file='counts_geochart.RData', geochart)
+# Print geochart to page.
+print(geochart)
 ```
