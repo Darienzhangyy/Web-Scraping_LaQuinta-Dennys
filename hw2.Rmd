@@ -7,7 +7,7 @@ output: html_document
 
 ## get_lq.R
 
-This document implements procedures to download websites of LaQuinta hotels that primarity operates in the United States and store those links into directory "data/lq/". We extract websites of those hotels by creating a function named 'scrape_list' that it has the following functionalty: (1) matching US state names from csv file to US state abbreviations on website to identify American hotels; (2) extracting country/state abbreviations and replace NA with "NA""; (3) extracting the indexes from `rows` corresponding to the first entry after the US label and before the Mexico label; (4) extracting the indexes from `rows` corresponding to the state abbreviations; (5) extracting the indexes from `rows` immediately following the state abbreviations and corresponding to all American hotels; (6) extracting the links from the nodes indexed by `state_rows`and return those links. Finally we implement the 'html_download' function to download those links that are extracted by 'Scrape_list' and store them into directory "data/lq/". \newline
+This document implements procedures to download websites of LaQuinta hotels that primarity operates in the United States and store those links into directory "data/lq/". We extract websites of those hotels by creating a function named `scrape_list` that it has the following functionalty: (1) matching US state names from csv file to US state abbreviations on website to identify American hotels; (2) extracting country/state abbreviations and replace NA with "NA""; (3) extracting the indexes from `rows` corresponding to the first entry after the US label and before the Mexico label; (4) extracting the indexes from `rows` corresponding to the state abbreviations; (5) extracting the indexes from `rows` immediately following the state abbreviations and corresponding to all American hotels; (6) extracting the links from the nodes indexed by `state_rows`and return those links. Finally we implement the `html_download` function to download those links that are extracted by `Scrape_list` and store them into directory "data/lq/". \newline
 
   
 \quad\newline
@@ -39,14 +39,14 @@ The constructed data frame has the following column names:
 
 ## get_dennys.R
 
-This document implements steps to download xml data from the Where2GetIt API and store them into 'data/dennys/' directory. We first implement a function named query_api that it takes input as 'coordinate' <a data frame row containing a longitude, a latitude, and a search radius>, 'key' (default=api_key) <a valid API key allowing data scraping>, and 'limit' (default=1000) <an upper bound for the number of search results returned>. It then returns an output of XML file containing the results of the API query that is downloaded to disk. Finally we run query_api on the rows of the 'dennys_coords.csv' data frame to download XML files containing Dennys locations.\newline
+This document implements steps to download xml data from the Where2GetIt API and store them into 'data/dennys/' directory. We first implement a function named `query_api` that it takes input as 'coordinate' <a data frame row containing a longitude, a latitude, and a search radius>, 'key' (default=`api_key`) <a valid API key allowing data scraping>, and 'limit' (default=1000) <an upper bound for the number of search results returned>. It then returns an output of XML file containing the results of the API query that is downloaded to disk. Finally we run `query_api` on the rows of the 'dennys_coords.csv' data frame to download XML files containing Dennys locations.\newline
 
 
 \quad\newline
 
 ## parse_dennys.R
 
-This documents parse denny's stores data and stores corresponding information as 'dennys.Rdata' in the 'data/' directory. We implement the procedures by (1) letting R read in xml file to a list;(2) creating a logical vector for subsetting the unique store ID numbers;(3) extracting the results nodes for the unique Dennys locations;(4) creating a function named scrape_tag() that it takes inputs 'tag' <a particular xml tag whose value is to be extracted>, and 'result'<a particular result node>, and returns an output that contains the value of the xml tag. We also create a function named scrape_dennys() that it takes input 'result' <a particular result node> and returns output as a character vector with five elements:
+This documents parse denny's stores data and stores corresponding information as 'dennys.Rdata' in the 'data/' directory. We implement the procedures by (1) letting R read in xml file to a list;(2) creating a logical vector for subsetting the unique store ID numbers;(3) extracting the results nodes for the unique Dennys locations;(4) creating a function named `scrape_tag` that it takes inputs 'tag' <a particular xml tag whose value is to be extracted>, and 'result'<a particular result node>, and returns an output that contains the value of the xml tag. We also create a function named `scrape_dennys` that it takes input 'result' <a particular result node> and returns output as a character vector with five elements:
             
             (1) clientkey, a unique store ID;
             
@@ -569,7 +569,7 @@ plot_objects = llply(plot_objects, function(object) { !(is.null(get(object))) } 
 # Write non-NULL plots to disk, if such plots exist.
 if(length(plot_objects)>0) {
   save_ggplot = function(object) {
-    ggsave(get(object), filename=paste0(object, '.pdf'), 
+    ggsave(get(object), filename=paste0('data/', object, '.pdf'), 
            width=7, height=3.8, units='in')
   }
   l_ply(plot_objects, save_ggplot)
