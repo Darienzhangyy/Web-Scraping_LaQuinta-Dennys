@@ -36,14 +36,23 @@ scrape_list = function(page) {
   rows_names = rows %>% 
                html_attr('name') %>% 
                str_replace_na
+  
+  # Extract the index from `rows` corresponding to the first entry after the US label.
+  begin = str_detect(rows_names, '^US$') %>% 
+    seq(length(rows))[.] %>% 
+    sum(1)
+  
+  # Extract the index from `rows` corresponding to the Mexico label.
+  end = str_detect(rows_names, '^MX$') %>% 
+    seq(length(rows))[.]
 
   # Extract the indexes from `rows` corresponding to the start of each state's hotel list.
-  state_starts = seq(length(rows))[rows_names %in% states] + 2
+  state_starts = seq(begin, end, 1)[rows_names[seq(begin, end, 1)] %in% states] + 2
   
   # Extract the indexes from `rows` corresponding to the end of each state's hotel list.
-  state_abbrs = rows_names[rows_names!='NA']
-  next_states = state_abbrs[which(state_abbrs==states) + 1]
-  state_ends = seq(length(rows))[rows_names %in% next_states] - 1
+  state_abbrs = rows_names[seq(begin, end, 1)][rows_names[seq(begin, end, 1)]!='NA']
+  next_states = state_abbrs[which(state_abbrs %in% states) + 1]
+  state_ends = seq(begin, end, 1)[rows_names[seq(begin, end, 1)] %in% next_states] - 1
   
   # Extract the indexes from `rows` corresponding to the indicated hotels.
   state_rows = apply(cbind(state_starts, state_ends), 1, function(row) { seq(row[1], row[2], 1) } ) %>%
