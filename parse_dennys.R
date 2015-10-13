@@ -80,6 +80,9 @@ dennys_info$state = suppressMessages(str_extract(dennys_info$address,
 dennys_info$zip = suppressMessages(str_extract(dennys_info$address, 
                                                perl('\\d{5}(?=(-\\d{4}|$))')))
 
+# Fix one missing ZIP code in Chinle, AZ.
+dennys_info$zip[which(dennys_info$zip=='00000')] = '86503'
+
 # Reorder the data frame.
 dennys_info = dennys_info[,c('clientkey', 'address', 'state', 'zip', 'phone', 'latitude', 'longitude')]
 
