@@ -1,5 +1,6 @@
 ---
-title: "hw2"
+title: "STA 523: Homework 2"
+author: "Eclectic Eagle Scouts"
 output: html_document
 ---
 
