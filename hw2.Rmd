@@ -463,134 +463,148 @@ party_distances = distances_by_cluster('party')
 ```{r fips_distance, results='asis', echo=F, warning=F, message=F}
 # Create a distance distribution plot and an average distance distribution plot for each 
 # level of aggregation, if non-NULL.
-if(is.null(fips_distances)) { 
-  fips_density_all = fips_density_average = NULL
-} else {
-  fips_density_all = ggplot(data=fips_distances, aes(x=distance)) + 
-    geom_density(color='#00BA38', fill='#00BA38') +
-    labs(x=paste0('Distance (miles); n=', nrow(fips_distances)), y=NULL, 
-         title='Distribution of La Quinta-Dennys distances \nwithin FIPS code')
-  fips_density_all
-  
-  fips_density_average = ggplot(data=summarize_by_cluster(fips_distances), aes(x=Mean)) + 
-    geom_density(color='#00BA38', fill='#00BA38') +
-    labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(fips_distances))), y=NULL, 
-         title='Distribution of average La Quinta-Dennys \ndistances by FIPS code')
-  fips_density_average
+if(exists(fips_distances)) { 
+  if(is.null(fips_distances)) {
+    fips_density_all = fips_density_average = NULL
+  } else {
+    fips_density_all = ggplot(data=fips_distances, aes(x=distance)) + 
+      geom_density(color='#00BA38', fill='#00BA38') +
+      labs(x=paste0('Distance (miles); n=', nrow(fips_distances)), y=NULL, 
+           title='Distribution of La Quinta-Dennys distances \nwithin FIPS code')
+    fips_density_all
+    
+    fips_density_average = ggplot(data=summarize_by_cluster(fips_distances), aes(x=Mean)) + 
+      geom_density(color='#00BA38', fill='#00BA38') +
+      labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(fips_distances))), y=NULL, 
+           title='Distribution of average La Quinta-Dennys \ndistances by FIPS code')
+    fips_density_average
+  }
 }
 ```
 
 ```{r zip_distance, results='asis', echo=F, warning=F, message=F}
-if(is.null(zip_distances)) {
-  zip_density_all = zip_density_average = NULL
-} else {
-  zip_density_all = ggplot(data=zip_distances, aes(x=distance)) + 
-    geom_density(color='#00BA38', fill='#00BA38') +
-    labs(x=paste0('Distance (miles); n=', nrow(zip_distances)), y=NULL, 
-         title='Distribution of La Quinta-Dennys distances \nwithin ZIP code')
-  zip_density_all
-  
-  zip_density_average = ggplot(data=summarize_by_cluster(zip_distances), aes(x=Mean)) + 
-    geom_density(color='#00BA38', fill='#00BA38') +
-    labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(zip_distances))), y=NULL, 
-         title='Distribution of average La Quinta-Dennys \ndistances by ZIP code')
-  zip_density_average
+if(exists(zip_distances)) { 
+  if(is.null(zip_distances)) {
+    zip_density_all = zip_density_average = NULL
+  } else {
+    zip_density_all = ggplot(data=zip_distances, aes(x=distance)) + 
+      geom_density(color='#00BA38', fill='#00BA38') +
+      labs(x=paste0('Distance (miles); n=', nrow(zip_distances)), y=NULL, 
+           title='Distribution of La Quinta-Dennys distances \nwithin ZIP code')
+    zip_density_all
+    
+    zip_density_average = ggplot(data=summarize_by_cluster(zip_distances), aes(x=Mean)) + 
+      geom_density(color='#00BA38', fill='#00BA38') +
+      labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(zip_distances))), y=NULL, 
+           title='Distribution of average La Quinta-Dennys \ndistances by ZIP code')
+    zip_density_average
+  }
 }
 ```
 
 ```{r county_distance, results='asis', echo=F, warning=F, message=F}
-if(is.null(county_distances)) { 
-  county_density_all = county_density_average = NULL
-} else {
-  county_density_all = ggplot(data=county_distances, aes(x=distance)) + 
-    geom_density(color='#00BA38', fill='#00BA38') +
-    labs(x=paste0('Distance (miles); n=', nrow(county_distances)), y=NULL, 
-         title='Distribution of La Quinta-Dennys distances \nwithin county')
-  county_density_all
-  
-  county_density_average = ggplot(data=summarize_by_cluster(county_distances), aes(x=Mean)) + 
-    geom_density(color='#00BA38', fill='#00BA38') +
-    labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(county_distances))), y=NULL, 
-         title='Distribution of average La Quinta-Dennys \ndistances by county')
-  county_density_average
+if(exists(county_distances)) { 
+  if(is.null(county_distances)) {
+    county_density_all = county_density_average = NULL
+  } else {
+    county_density_all = ggplot(data=county_distances, aes(x=distance)) + 
+      geom_density(color='#00BA38', fill='#00BA38') +
+      labs(x=paste0('Distance (miles); n=', nrow(county_distances)), y=NULL, 
+           title='Distribution of La Quinta-Dennys distances \nwithin county')
+    county_density_all
+    
+    county_density_average = ggplot(data=summarize_by_cluster(county_distances), aes(x=Mean)) + 
+      geom_density(color='#00BA38', fill='#00BA38') +
+      labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(county_distances))), y=NULL, 
+           title='Distribution of average La Quinta-Dennys \ndistances by county')
+    county_density_average
+  }
 }
 ```
 
 ```{r state_distance, results='asis', echo=F, warning=F, message=F}
-if(is.null(state_distances)) {
-  state_density_all = state_density_average = NULL
-} else {
-  state_density_all = ggplot(data=state_distances, aes(x=distance)) + 
-    geom_density(color='#00BA38', fill='#00BA38') +
-    labs(x=paste0('Distance (miles); n=', nrow(state_distances)), y=NULL, 
-         title='Distribution of La Quinta-Dennys distances \nwithin state')
-  state_density_all
-  
-  state_density_average = ggplot(data=summarize_by_cluster(state_distances), aes(x=Mean)) + 
-    geom_density(color='#00BA38', fill='#00BA38') +
-    labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(state_distances))), y=NULL, 
-         title='Distribution of average La Quinta-Dennys \ndistances by state')
-  state_density_average
+if(exists(state_distances)) { 
+  if(is.null(state_distances)) {
+    state_density_all = state_density_average = NULL
+  } else {
+    state_density_all = ggplot(data=state_distances, aes(x=distance)) + 
+      geom_density(color='#00BA38', fill='#00BA38') +
+      labs(x=paste0('Distance (miles); n=', nrow(state_distances)), y=NULL, 
+           title='Distribution of La Quinta-Dennys distances \nwithin state')
+    state_density_all
+    
+    state_density_average = ggplot(data=summarize_by_cluster(state_distances), aes(x=Mean)) + 
+      geom_density(color='#00BA38', fill='#00BA38') +
+      labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(state_distances))), y=NULL, 
+           title='Distribution of average La Quinta-Dennys \ndistances by state')
+    state_density_average
+  }
 }
 ```
 
 ```{r court_distance, results='asis', echo=F, warning=F, message=F}
-if(is.null(court_distances)) { 
-  court_density_all = court_density_average = NULL
-} else {
-  court_density_all = ggplot(data=court_distances, aes(x=distance)) + 
-    geom_density(color='#00BA38', fill='#00BA38') +
-    labs(x=paste0('Distance (miles); n=', nrow(court_distances)), y=NULL, 
-         title='Distribution of La Quinta-Dennys distances \nwithin district court jurisdiction')
-  court_density_all
-  
-  court_density_average = ggplot(data=summarize_by_cluster(court_distances), aes(x=Mean)) + 
-    geom_density(color='#00BA38', fill='#00BA38') +
-    labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(court_distances))), y=NULL, 
-         title='Distribution of average La Quinta-Dennys \ndistances by district court jurisdiction')
-  court_density_average
+if(exists(court_distances)) { 
+  if(is.null(court_distances)) {
+    court_density_all = court_density_average = NULL
+  } else {
+    court_density_all = ggplot(data=court_distances, aes(x=distance)) + 
+      geom_density(color='#00BA38', fill='#00BA38') +
+      labs(x=paste0('Distance (miles); n=', nrow(court_distances)), y=NULL, 
+           title='Distribution of La Quinta-Dennys distances \nwithin district court jurisdiction')
+    court_density_all
+    
+    court_density_average = ggplot(data=summarize_by_cluster(court_distances), aes(x=Mean)) + 
+      geom_density(color='#00BA38', fill='#00BA38') +
+      labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(court_distances))), y=NULL, 
+           title='Distribution of average La Quinta-Dennys \ndistances by district court jurisdiction')
+    court_density_average
+  }
 }
 ```
 
 ```{r cd_distance, results='asis', echo=F, warning=F, message=F}
-if(is.null(cd_distances)) { 
-  cd_density_all = cd_density_average = NULL
-} else {
-  cd_density_all = ggplot(data=cd_distances, aes(x=distance)) + 
-    geom_density(color='#00BA38', fill='#00BA38') +
-    labs(x=paste0('Distance (miles); n=', nrow(cd_distances)), y=NULL, 
-         title='Distribution of La Quinta-Dennys distances \nwithin congressional district')
-  cd_density_all
-  
-  cd_density_average = ggplot(data=summarize_by_cluster(cd_distances), aes(x=Mean)) + 
-    geom_density(color='#00BA38', fill='#00BA38') +
-    labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(cd_distances))), y=NULL, 
-         title='Distribution of average La Quinta-Dennys \ndistances by congressional district')
-  cd_density_average
+if(exists(cd_distances)) { 
+  if(is.null(cd_distances)) {
+    cd_density_all = cd_density_average = NULL
+  } else {
+    cd_density_all = ggplot(data=cd_distances, aes(x=distance)) + 
+      geom_density(color='#00BA38', fill='#00BA38') +
+      labs(x=paste0('Distance (miles); n=', nrow(cd_distances)), y=NULL, 
+           title='Distribution of La Quinta-Dennys distances \nwithin congressional district')
+    cd_density_all
+    
+    cd_density_average = ggplot(data=summarize_by_cluster(cd_distances), aes(x=Mean)) + 
+      geom_density(color='#00BA38', fill='#00BA38') +
+      labs(x=paste0('Distance (miles); n=', nrow(summarize_by_cluster(cd_distances))), y=NULL, 
+           title='Distribution of average La Quinta-Dennys \ndistances by congressional district')
+    cd_density_average
+  }
 }  
 ```
 
 ```{r party_distance, results='asis', echo=F, warning=F, message=F}
-if(is.null(party_distances) | length(unique(party_distances$cluster))==1) { 
-  party_density_all = party_bar = NULL
-} else {
-  party_density_all = ggplot(data=party_distances, aes(x=distance, color=cluster, fill=cluster)) + 
-    geom_density(alpha=0.5) +
-    scale_color_manual(breaks=c('D', 'R'), labels=c('Democratic', 'Republican'), 
-                       values=c('#00BFC4', '#F8766D'), name='Partisan ID') +
-    scale_fill_manual(breaks=c('D', 'R'), labels=c('Democratic', 'Republican'), 
-                      values=c('#00BFC4', '#F8766D'), name='Partisan ID') +
-    labs(x=paste0('Distance (miles); n=', nrow(party_distances)), y=NULL, 
-         title='Distribution of La Quinta-Dennys distances \nby partisan ID of congressional representative')
-  party_density_all
-  
-  party_bar = ggplot(data=summarize_by_cluster(party_distances), aes(x=cluster, y=Mean, fill=cluster)) + 
-    geom_bar(stat='identity', show_guide=F) + 
-    scale_x_discrete(breaks=c('D', 'R'), labels=c('Democratic', 'Republican')) + 
-    scale_fill_manual(breaks=c('D', 'R'), values=c('#00BFC4', '#F8766D')) +
-    labs(x='Partisan ID', y='Distance (miles)', 
-         title='Average La Quinta-Dennys distances by \npartisan ID of congressional representative')
-  party_bar
+if(exists(party_distances)) { 
+  if(is.null(party_distances) | length(unique(party_distances$cluster))==1) {
+    party_density_all = party_bar = NULL
+  } else {
+    party_density_all = ggplot(data=party_distances, aes(x=distance, color=cluster, fill=cluster)) + 
+      geom_density(alpha=0.5) +
+      scale_color_manual(breaks=c('D', 'R'), labels=c('Democratic', 'Republican'), 
+                         values=c('#00BFC4', '#F8766D'), name='Partisan ID') +
+      scale_fill_manual(breaks=c('D', 'R'), labels=c('Democratic', 'Republican'), 
+                        values=c('#00BFC4', '#F8766D'), name='Partisan ID') +
+      labs(x=paste0('Distance (miles); n=', nrow(party_distances)), y=NULL, 
+           title='Distribution of La Quinta-Dennys distances \nby partisan ID of congressional representative')
+    party_density_all
+    
+    party_bar = ggplot(data=summarize_by_cluster(party_distances), aes(x=cluster, y=Mean, fill=cluster)) + 
+      geom_bar(stat='identity', show_guide=F) + 
+      scale_x_discrete(breaks=c('D', 'R'), labels=c('Democratic', 'Republican')) + 
+      scale_fill_manual(breaks=c('D', 'R'), values=c('#00BFC4', '#F8766D')) +
+      labs(x='Partisan ID', y='Distance (miles)', 
+           title='Average La Quinta-Dennys distances by \npartisan ID of congressional representative')
+    party_bar
+  }
 }
 
 # Create list of non-NULL plots for plotting.
