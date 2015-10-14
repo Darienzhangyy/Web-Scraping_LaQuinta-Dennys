@@ -78,11 +78,11 @@ scrape_list = function(page) {
 html_download = function(link) {
   download.file(link, destfile=paste0(to_put, basename(link)), quiet=T)
   
-  # Direct the computer to rest for one minute after downloading the webpage.
-  Sys.sleep(60)
+  # Direct the computer to rest for half a minute after downloading the webpage.
+  Sys.sleep(30)
 }
 
 
-# Download the webpage for each La Quinta hotel in the US, at a rate of one per minute.
+# Download the webpage for each La Quinta hotel in the US, at a rate of two per minute.
 # l_ply takes each element of a list, apply function and discard results
 scrape_list(page) %>% l_ply(.fun=html_download)
