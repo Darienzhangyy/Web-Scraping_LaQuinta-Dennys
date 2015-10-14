@@ -464,7 +464,6 @@ party_distances = distances_by_cluster('party')
 ```{r fips_distance, results='asis', echo=F, warning=F, message=F}
 # Create a distance distribution plot and an average distance distribution plot for each 
 # level of aggregation, if non-NULL.
-if(exists(fips_distances)) { 
   if(is.null(fips_distances)) {
     fips_density_all = fips_density_average = NULL
   } else {
@@ -480,11 +479,9 @@ if(exists(fips_distances)) {
            title='Distribution of average La Quinta-Dennys \ndistances by FIPS code')
     fips_density_average
   }
-}
 ```
 
 ```{r zip_distance, results='asis', echo=F, warning=F, message=F}
-if(exists(zip_distances)) { 
   if(is.null(zip_distances)) {
     zip_density_all = zip_density_average = NULL
   } else {
@@ -500,11 +497,9 @@ if(exists(zip_distances)) {
            title='Distribution of average La Quinta-Dennys \ndistances by ZIP code')
     zip_density_average
   }
-}
 ```
 
 ```{r county_distance, results='asis', echo=F, warning=F, message=F}
-if(exists(county_distances)) { 
   if(is.null(county_distances)) {
     county_density_all = county_density_average = NULL
   } else {
@@ -520,11 +515,9 @@ if(exists(county_distances)) {
            title='Distribution of average La Quinta-Dennys \ndistances by county')
     county_density_average
   }
-}
 ```
 
 ```{r state_distance, results='asis', echo=F, warning=F, message=F}
-if(exists(state_distances)) { 
   if(is.null(state_distances)) {
     state_density_all = state_density_average = NULL
   } else {
@@ -540,11 +533,9 @@ if(exists(state_distances)) {
            title='Distribution of average La Quinta-Dennys \ndistances by state')
     state_density_average
   }
-}
 ```
 
 ```{r court_distance, results='asis', echo=F, warning=F, message=F}
-if(exists(court_distances)) { 
   if(is.null(court_distances)) {
     court_density_all = court_density_average = NULL
   } else {
@@ -560,11 +551,9 @@ if(exists(court_distances)) {
            title='Distribution of average La Quinta-Dennys \ndistances by district court jurisdiction')
     court_density_average
   }
-}
 ```
 
 ```{r cd_distance, results='asis', echo=F, warning=F, message=F}
-if(exists(cd_distances)) { 
   if(is.null(cd_distances)) {
     cd_density_all = cd_density_average = NULL
   } else {
@@ -580,11 +569,9 @@ if(exists(cd_distances)) {
            title='Distribution of average La Quinta-Dennys \ndistances by congressional district')
     cd_density_average
   }
-}  
 ```
 
 ```{r party_distance, results='asis', echo=F, warning=F, message=F}
-if(exists(party_distances)) { 
   if(is.null(party_distances) | length(unique(party_distances$cluster))==1) {
     party_density_all = party_bar = NULL
   } else {
@@ -606,7 +593,6 @@ if(exists(party_distances)) {
            title='Average La Quinta-Dennys distances by \npartisan ID of congressional representative')
     party_bar
   }
-}
 
 # Create list of non-NULL plots for plotting.
 # prefixes = c('fips', 'zip', 'county', 'state', 'court', 'cd')
