@@ -67,11 +67,11 @@ We then extract the relevant information from the search results into a data fra
 
 ## Distance Analysis
 
-
-We calculate and aggregate the paired distances between LaQuinta and Denny's in different locations according to divisions of congressional districts, US disctrict courts and states. We first calculate paired distances using haversine formula and store the distance results into stateDistance.Rdata in '/data/' directory. We also visualize the number of LaQuinta and Denny's in each state and their corresponding distances in each state. The link to the visualization is here:http://rpubs.com/Darien/117132 
-
-\quad\newline
-Caculate distances of LaQuita and Denny's and visualize the results:
+To analyze Mitch Hedberg's claim, we leverage the scraped location attributes to add additional columns to the `hotel_info` and `dennys_info` data frames. First, we use latitude and longitude coordinates to gather the congressional district, representative, and partisan control for each location using the Congress API from the Sunlight Foundation, which returns easily parsed JSON files. Next, the US federal district court jurisdiction is collected from the Court Locator hosted at www.us.courts.gov, where ZIP code inputs yield web pages for the `rvest` package. Finally, the Census Block Conversions API at the Federal Communications Commission (FCC) permits the use of longitude and latitude coordinates to retrieve a Federal Information Processing Standard (FIPS) code for each location; the FIPS codes incorporate geographic information, including the state, county, and census block of each location.  
+  
+These additional columns are then used as levels at which to aggregate pairs of Denny's-La Quinta locations. For example, using the congressional district as the level of aggregation, the `distances_by_cluster()`, `get_coords()`, `format_coords()`, and `haversine()` functions generate all location pairings within each district before calculating the great circle distance via application of the haversine formula to latitude and longitude coordinates. For each level of aggregation, this process is repeated to produce a distance data frame, and this is used to generate two distribution plots: one displaying the distribution of ALL of these Denny's-La Quinta distances and another displaying the distribution of AVERAGE distances by level of aggregation.  
+  
+We also visualize the number of LaQuinta and Denny's in each state and their corresponding distances in each state. http://rpubs.com/Darien/117132 contains Google Geochart visualizations produced via the `googleVis` package.
 
 ```{r setup, results='asis', echo=F, warning=F, message=F}
 load('data/lq.Rdata'); load('data/dennys.Rdata')
@@ -611,8 +611,6 @@ party_distances = distances_by_cluster('party')
 #   l_ply(plot_objects, save_ggplot)
 # }
 ```
-
-
 
 ```{r generate_geochart, results='asis', echo=F, warning=F, message=F}
 # count_by_state()
