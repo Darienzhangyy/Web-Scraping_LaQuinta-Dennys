@@ -79,10 +79,10 @@ html_download = function(link) {
   download.file(link, destfile=paste0(to_put, basename(link)), quiet=T)
   
   # Direct the computer to rest for a quarter of a second after downloading the webpage.
-  Sys.sleep(6)
+  Sys.sleep(10)
 }
 
 
-# Download the webpage for each La Quinta hotel in the US, at a rate of four per second.
+# Download the webpage for each La Quinta hotel in the US, at a rate of one every ten seconds.
 # l_ply takes each element of a list, apply function and discard results
 scrape_list(page) %>% l_ply(.fun=html_download)
