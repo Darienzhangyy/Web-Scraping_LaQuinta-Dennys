@@ -71,7 +71,7 @@ To analyze Mitch Hedberg's claim, we leverage the scraped location attributes to
   
 These additional columns are then used as levels at which to aggregate pairs of Denny's-La Quinta locations. For example, using the congressional district as the level of aggregation, the `distances_by_cluster()`, `get_coords()`, `format_coords()`, and `haversine()` functions generate all location pairings within each district before calculating the great circle distance via application of the haversine formula to latitude and longitude coordinates. For each level of aggregation, this process is repeated to produce a distance data frame, and this is used to generate two distribution plots: one displaying the distribution of ALL of these Denny's-La Quinta distances and another displaying the distribution of AVERAGE distances by level of aggregation.  
   
-We also visualize the number of LaQuinta and Denny's in each state and their corresponding distances in each state. http://rpubs.com/Darien/117132 contains Google Geochart visualizations produced via the `googleVis` package.
+We also visualize the number of LaQuinta and Denny's in each state and their corresponding distances in each state. http://rpubs.com/Darien/117132 contains Google Geochart visualizations produced via the `googleVis` package, while the logged counts by state are displayed below the density plots.
 
 ```{r setup, results='asis', echo=F, warning=F, message=F}
 load('data/lq.Rdata'); load('data/dennys.Rdata')
