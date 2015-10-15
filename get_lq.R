@@ -78,8 +78,8 @@ scrape_list = function(page) {
 html_download = function(link) {
   download.file(link, destfile=paste0(to_put, basename(link)), quiet=T)
   
-  # Direct the computer to rest for 15 seconds after downloading the webpage.
-  Sys.sleep(15)
+  # Direct the computer to rest for 25 seconds after downloading the webpage.
+  Sys.sleep(25)
 }
 
 
