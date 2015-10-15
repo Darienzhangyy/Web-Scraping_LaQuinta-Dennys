@@ -663,7 +663,7 @@ distance_cv <- function(distance){
   return(cv)
 }
 
-load('distance_data.rdata')
+load('distance_data.Rdata')
 distance_cv(cd_distances)
 distance_cv(court_distances)
 distance_cv(stateDistance)
