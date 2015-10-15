@@ -645,3 +645,28 @@ geochart = gvisMerge(hotel_plot, dennys_plot, horizontal=T, tableOptions='cellsp
 # Print geochart to page.
 print(geochart)
 ```
+
+```{r credible interval analysis , results='asis', echo=F, warning=F, message=F}
+
+# distance_cv()
+#############################################################################################
+# Input: distance, one data.frame containing distance information between lq and denney.
+#
+# Output: cv, a 95% credible interval that the distance between lq and denney may be.
+distance_cv <- function(distance){
+  dis_name <- substitute(distance)
+  mean_distance <- unlist(distance[5])
+  plot(density(mean_distance), main = paste("density of ", dis_name), xlab = '')
+  cv <- quantile(mean_distance, c(.025, .975))
+  abline(v = cv[1], col = 'red')
+  abline(v = cv[2], col = 'red')
+  return(cv)
+}
+
+load('distance_data.rdata')
+distance_cv(cd_distances)
+distance_cv(court_distances)
+distance_cv(stateDistance)
+
+```
+
