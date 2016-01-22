@@ -27,7 +27,7 @@ this document details how your group has chosen to implement your various downlo
 
 This observation is a joke made famous by the late comedian Mitch Hedberg. Last year, John Reiser on his blog detailed an approach to assess how true this joke actually is by scraping location data for all US locations of La Quinta and Denny’s. Your goal for this homework will be to recreate this analysis within R and expand on both the data collection and analysis.
 
-#Task 1 - Scraping La Quinta
+#1 - Scraping La Quinta
 
 The original blog post states that the location of all the La Quinta’s was obtained via hotelMarkers.js from La Quinta’s website which contains JSON data with the latitude and longitude of each location. This is enough to answer our question about location relative to Denny’s restaurants, but we would also like to have more data available such as street addresses, phone numbers, amenities, etc.
 
@@ -39,13 +39,13 @@ Finally, note that you should not abuse this or any other web page or API, make 
 
 Your write up should include a discussion of your scraping approach.
 
-#Task 2 - Scraping Denny’s
+#2 - Scraping Denny’s
 
 Scraping the Denny’s site is somewhat more complicated as it relies on a 3rd party service to display its locations. For this scraping task it is ok to use the same approach used in the blog post and directly pull results from the Where2GetIt web API. We will discuss in class how to identify and work with this specific API. Your core task will be to fetch and parse the XML files that result from the API calls and combining their results in R. Note that it is important to verify that these calls are sufficient to obtain all Denny’s locations, and your write up should include some discussion of this.
 
 Once again, any web page or API result used should be cached locally and all analyses should be in self contained R scripts connected by a single Makefile.
 
-#Task 3 - Distance Analysis
+#3 - Distance Analysis
 
 Using the results of your scraping you should analyze the veracity of Hedberg’s claim. This is left as an open ended exercise - there is not one correct approach. This can include anything from visualizations to tabulations, but will hopefully be more than just a list of the La Quinta and Denny’s pairs that happen to be within an arbitrary radius.
 
